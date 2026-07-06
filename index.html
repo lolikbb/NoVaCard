@@ -259,7 +259,7 @@ html, body {
 }
 .cat-pill img { width: 18px; height: 18px; }
 
-/* ═══ ТОВАРЫ С ПЛАВНОЙ АНИМАЦИЕЙ ВСЕЙ СЕТКИ ═══ */
+/* ═══ ТОВАРЫ С ПЛАВНОЙ АНИМАЦИЕЙ ═══ */
 .product-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -321,7 +321,6 @@ html, body {
     display: flex; flex-direction: column; align-items: center; gap: 10px;
     font-size: 13.5px;
 }
-.empty-emoji { font-size: 30px; }
 
 .order-list { display: flex; flex-direction: column; gap: 12px; }
 .order-item { border-radius: var(--radius-md); padding: 16px; }
@@ -694,13 +693,6 @@ html, body {
     color: var(--text-dim);
 }
 
-/* Стиль для пустого состояния без эмодзи */
-.empty-state-icon {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto 10px;
-}
-
 .app.hidden { display: none; }
 </style>
 </head>
@@ -987,7 +979,7 @@ function getTelegramUser() {
         first_name: user.first_name || 'Пользователь',
         last_name: user.last_name || '',
         photo_url: user.photo_url || null,
-        is_admin: true,
+        is_admin: false, // По умолчанию false
       };
     }
   } catch (e) {
@@ -1045,14 +1037,18 @@ const STORE_DATA = {
 // ═══════════════════════════════════════════════════
 
 const tgUser = getTelegramUser();
+
+// ⭐ СПИСОК АДМИНОВ (Telegram ID)
+const ADMIN_IDS = [6997844740]; // Добавьте сюда ID админов
+
 const CURRENT_USER = {
-  id: tgUser?.id || 123456789,
-  tg_id: tgUser?.id || 123456789,
+  id: tgUser?.id || 6997844740,
+  tg_id: tgUser?.id || 6997844740,
   username: tgUser?.username || 'user',
   first_name: tgUser?.first_name || 'Пользователь',
   last_name: tgUser?.last_name || '',
   photo_url: tgUser?.photo_url || null,
-  is_admin: true,
+  is_admin: ADMIN_IDS.includes(tgUser?.id || 6997844740),
 };
 
 let SELECTED_CATEGORY = null;
@@ -1233,7 +1229,7 @@ function setupIcons() {
 }
 
 // ═══════════════════════════════════════════════════
-// ПОЛЬЗОВАТЕЛЬ — ИСПРАВЛЕННАЯ ВЕРСИЯ
+// ПОЛЬЗОВАТЕЛЬ
 // ═══════════════════════════════════════════════════
 
 function renderUser() {
@@ -1246,13 +1242,11 @@ function renderUser() {
     const avatarLg = document.getElementById('avatar-lg');
     const initial = name[0]?.toUpperCase() || "U";
 
-    // Очищаем аватары
     avatarEl.innerHTML = '';
     avatarLg.innerHTML = '';
 
     let hasPhoto = false;
 
-    // Пробуем получить фото из Telegram
     try {
         const tg = window.Telegram?.WebApp;
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
@@ -1268,25 +1262,30 @@ function renderUser() {
         console.log('❌ Ошибка получения фото:', e);
     }
 
-    // Если нет фото — показываем инициалы
     if (!hasPhoto) {
         console.log('ℹ️ Фото не найдено, показываем инициалы');
         avatarEl.textContent = initial;
         avatarLg.textContent = initial;
     }
 
-    // Показываем админ-панель
-    const showAdmin = true;
+    // ⭐ ПОКАЗЫВАЕМ АДМИН-ПАНЕЛЬ ТОЛЬКО ДЛЯ АДМИНОВ
+    const showAdmin = CURRENT_USER.is_admin;
+    const gearBtn = document.getElementById("btn-admin-gear");
+    const menuAdmin = document.getElementById("menu-admin");
+    
     if (showAdmin) {
-        const gearBtn = document.getElementById("btn-admin-gear");
-        const menuAdmin = document.getElementById("menu-admin");
         if (gearBtn) gearBtn.style.display = "flex";
         if (menuAdmin) menuAdmin.style.display = "flex";
+        console.log('✅ Админ-панель активирована для пользователя', CURRENT_USER.tg_id);
+    } else {
+        if (gearBtn) gearBtn.style.display = "none";
+        if (menuAdmin) menuAdmin.style.display = "none";
+        console.log('❌ Админ-панель скрыта для пользователя', CURRENT_USER.tg_id);
     }
 }
 
 // ═══════════════════════════════════════════════════
-// КАТЕГОРИИ
+// КАТЕГОРИИ — ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ═══════════════════════════════════════════════════
 
 function renderCategories() {
@@ -1311,40 +1310,50 @@ function renderCategories() {
     initDragScroll(homeContainer);
     initDragScroll(catalogContainer);
 
-    // Обработчики для HOME
+    // ⭐ Обработчики для HOME — ИСПРАВЛЕНЫ
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const catId = btn.dataset.cat ? Number(btn.dataset.cat) : null;
+        btn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            const catId = this.dataset.cat ? Number(this.dataset.cat) : null;
+            
+            // Обновляем активный класс
             document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            updateProducts('featured-products', getProducts(catId).slice(0, 4));
+            this.classList.add("active");
+            
+            // Обновляем товары
+            const products = getProducts(catId).slice(0, 4);
+            updateProducts('featured-products', products);
         });
     });
 
-    // Обработчики для CATALOG
+    // ⭐ Обработчики для CATALOG — ИСПРАВЛЕНЫ
     document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(btn => {
-        btn.addEventListener("click", () => {
-            SELECTED_CATEGORY = btn.dataset.cat ? Number(btn.dataset.cat) : null;
+        btn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            SELECTED_CATEGORY = this.dataset.cat ? Number(this.dataset.cat) : null;
+            
+            // Обновляем активный класс
             document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            updateProducts('catalog-products', getProducts(SELECTED_CATEGORY));
+            this.classList.add("active");
+            
+            // Обновляем товары
+            const products = getProducts(SELECTED_CATEGORY);
+            updateProducts('catalog-products', products);
         });
     });
 }
 
 // ═══════════════════════════════════════════════════
-// ПЛАВНОЕ ОБНОВЛЕНИЕ ТОВАРОВ (вся сетка целиком)
+// ПЛАВНОЕ ОБНОВЛЕНИЕ ТОВАРОВ
 // ═══════════════════════════════════════════════════
 
 function updateProducts(containerId, products) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Плавно скрываем
     container.classList.add('fade-out');
 
     setTimeout(() => {
-        // Рендерим новые товары
         if (products.length === 0) {
             container.innerHTML = `
                 <div class="empty-state glass" style="grid-column:1/-1">
@@ -1371,7 +1380,6 @@ function updateProducts(containerId, products) {
             bindProductCards(container);
         }
 
-        // Плавно показываем
         container.classList.remove('fade-out');
     }, 350);
 }
