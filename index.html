@@ -778,7 +778,7 @@ html, body {
     </header>
     <div class="order-list" id="order-list"></div>
     <div class="empty-state glass" id="orders-empty" style="display:none">
-        <div class="empty-state-icon" id="empty-icon"></div>
+        <div style="margin:0 auto 10px;"><img src="" alt="empty" id="empty-icon" style="width:48px;height:48px;"></div>
         <div>Заказов пока нет</div>
     </div>
   </section>
@@ -827,8 +827,8 @@ html, body {
 
     <div class="admin-panel" id="admin-products">
       <button class="btn-primary" id="btn-new-product" style="display:flex;align-items:center;justify-content:center;gap:10px;">
-            <img src="" alt="add" id="btn-add-icon" style="width:20px;height:20px;"> Добавить товар
-        </button>
+        <img src="" alt="add" id="btn-add-icon" style="width:20px;height:20px;"> Добавить товар
+      </button>
       <div class="admin-list" id="admin-product-list"></div>
     </div>
 
@@ -880,11 +880,11 @@ html, body {
   <div class="sheet glass" id="pay-sheet">
     <div class="sheet-handle"></div>
     <div class="pay-status" id="pay-status">
-      <div class="spinner" id="pay-spinner"></div>
-      <div class="pay-status-title" id="pay-status-title">Ожидание оплаты…</div>
-      <div class="pay-status-sub" id="pay-status-sub">Имитация оплаты через 3 секунды</div>
-      <div class="delivered-box" id="delivered-box" style="display:none"></div>
-      <button class="btn-close" id="pay-close" style="display:none;">Закрыть</button>
+        <div id="pay-spinner" style="display:block;">${ic('loader', 44, '#34E7C4')}</div>
+        <div class="pay-status-title" id="pay-status-title">Ожидание оплаты…</div>
+        <div class="pay-status-sub" id="pay-status-sub">Имитация оплаты через 3 секунды</div>
+        <div class="delivered-box" id="delivered-box" style="display:none"></div>
+        <button class="btn-close" id="pay-close" style="display:none;">Закрыть</button>
     </div>
   </div>
 </div>
@@ -1155,11 +1155,16 @@ function setupIcons() {
     setIcon(document.getElementById('btn-send-icon'), 'send', 20, '#f5f5f5');
     setIcon(document.getElementById('btn-users-icon'), 'users', 20, '#8f8f8f');
 
+    // ✅ НОВЫЕ ИКОНКИ (добавь это)
     // Пустое состояние заказов
     setIcon(document.getElementById('empty-icon'), 'inbox', 48, '#8f8f8f');
     
     // Кнопка добавить товар
     setIcon(document.getElementById('btn-add-icon'), 'plus', 20, '#f5f5f5');
+
+    // Иконки для статусов оплаты
+    setIcon(document.getElementById('pay-success-icon'), 'check-circle', 48, '#34E7C4');
+    setIcon(document.getElementById('pay-spinner-icon'), 'loader', 44, '#34E7C4');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1172,20 +1177,23 @@ function renderUser() {
     document.getElementById("profile-name").textContent = name;
     document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
     
-    // Аватарка - используем инициалы с градиентом
+    // Аватарка
     const avatarEl = document.getElementById('avatar');
     const avatarLg = document.getElementById('avatar-lg');
     const initial = name[0]?.toUpperCase() || "U";
     
-    // Пробуем получить фото через Telegram
-    if (window.tg && window.tg.initDataUnsafe && window.tg.initDataUnsafe.user) {
-        const user = window.tg.initDataUnsafe.user;
-        if (user.photo_url) {
-            avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
-            avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
-            return;
+    // Пробуем получить фото из Telegram
+    try {
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            if (user.photo_url) {
+                avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
+                avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
+                return;
+            }
         }
-    }
+    } catch (e) {}
     
     // Если нет фото - показываем инициалы
     avatarEl.textContent = initial;
@@ -1213,18 +1221,15 @@ function renderCategories() {
         `).join("")}
     `;
     
-    // Рендерим обе секции
     document.getElementById("cat-scroll-home").innerHTML = html(null);
     document.getElementById("cat-scroll-catalog").innerHTML = html(SELECTED_CATEGORY);
 
     // Обработчики для HOME
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
+        btn.addEventListener("click", () => {
             const catId = btn.dataset.cat ? Number(btn.dataset.cat) : null;
             document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            // Фильтруем товары на главной
             const products = getProducts(catId);
             document.getElementById("featured-products").innerHTML = products.slice(0, 4).map(productCardHTML).join("");
             bindProductCards();
@@ -1274,7 +1279,7 @@ function loadCatalog() {
     if (products.length === 0) {
         document.getElementById("catalog-products").innerHTML = `
             <div class="empty-state glass" style="grid-column:1/-1">
-                <div class="empty-state-icon" style="margin:0 auto 10px;">${ic('package', 48, '#8f8f8f')}</div>
+                <div style="margin:0 auto 10px;">${ic('package', 48, '#8f8f8f')}</div>
                 <div>Товаров нет</div>
             </div>
         `;
@@ -1368,12 +1373,13 @@ document.getElementById("btn-buy").addEventListener("click", () => {
 const payOverlay = document.getElementById("pay-overlay");
 
 function openPaySheet() {
-  document.getElementById("pay-spinner").style.display = "block";
-  document.getElementById("pay-status-title").textContent = "Ожидание оплаты…";
-  document.getElementById("pay-status-sub").textContent = "Имитация оплаты через 3 секунды";
-  document.getElementById("delivered-box").style.display = "none";
-  document.getElementById("pay-close").style.display = "none";
-  payOverlay.classList.add("open");
+    document.getElementById("pay-spinner").style.display = "block";
+    const titleEl = document.getElementById("pay-status-title");
+    titleEl.innerHTML = `${ic('clock', 24, '#FFB454')} Ожидание оплаты…`;
+    document.getElementById("pay-status-sub").textContent = "Имитация оплаты через 3 секунды";
+    document.getElementById("delivered-box").style.display = "none";
+    document.getElementById("pay-close").style.display = "none";
+    payOverlay.classList.add("open");
 }
 
 document.getElementById("pay-close").addEventListener("click", () => {
@@ -1382,48 +1388,52 @@ document.getElementById("pay-close").addEventListener("click", () => {
 });
 
 function finishPayment(orderId) {
-  const order = STORE_DATA.orders.find(o => o.id === orderId);
-  if (!order || order.status === "paid") return;
-  
-  const product = getProduct(order.product_id);
-  let delivered = null;
-  
-  if (product.type === "key") {
-    const key = getAvailableKey(product.id);
-    if (key) {
-      if (!STORE_DATA.usedKeys[product.id]) {
-        STORE_DATA.usedKeys[product.id] = [];
-      }
-      STORE_DATA.usedKeys[product.id].push(key);
-      delivered = key;
-    } else {
-      delivered = "❌ Ключи закончились, обратитесь в поддержку";
+    const order = STORE_DATA.orders.find(o => o.id === orderId);
+    if (!order || order.status === "paid") return;
+    
+    const product = getProduct(order.product_id);
+    let delivered = null;
+    
+    if (product.type === "key") {
+        const key = getAvailableKey(product.id);
+        if (key) {
+            if (!STORE_DATA.usedKeys[product.id]) {
+                STORE_DATA.usedKeys[product.id] = [];
+            }
+            STORE_DATA.usedKeys[product.id].push(key);
+            delivered = key;
+        } else {
+            delivered = "❌ Ключи закончились, обратитесь в поддержку";
+        }
+    } else if (product.type === "subscription") {
+        delivered = `✅ Подписка «${product.title}» активирована на ${product.duration_days} дней`;
     }
-  } else if (product.type === "subscription") {
-    delivered = `✅ Подписка «${product.title}» активирована на ${product.duration_days} дней`;
-  }
-  
-  order.status = "paid";
-  order.delivered_content = delivered;
-  order.paid_at = new Date().toISOString();
-  
-  document.getElementById("pay-spinner").style.display = "none";
-  document.getElementById("pay-close").style.display = "block";
-  document.getElementById("pay-status-title").textContent = "✅ Оплачено!";
-  document.getElementById("pay-status-sub").textContent = "Ваш товар готов";
-  
-  if (delivered) {
-    const box = document.getElementById("delivered-box");
-    box.style.display = "block";
-    box.innerHTML = `<code>${delivered}</code>`;
-  }
-  
-  if (window.tg?.HapticFeedback) {
-    window.tg.HapticFeedback.notificationOccurred("success");
-  }
-  
-  loadFeatured();
-  loadCatalog();
+    
+    order.status = "paid";
+    order.delivered_content = delivered;
+    order.paid_at = new Date().toISOString();
+    
+    // 🎯 ИСПРАВЛЕНО: без эмодзи
+    document.getElementById("pay-spinner").style.display = "none";
+    document.getElementById("pay-close").style.display = "block";
+    
+    const titleEl = document.getElementById("pay-status-title");
+    titleEl.innerHTML = `${ic('check-circle', 24, '#34E7C4')} Оплачено!`;
+    
+    document.getElementById("pay-status-sub").textContent = "Ваш товар готов";
+    
+    if (delivered) {
+        const box = document.getElementById("delivered-box");
+        box.style.display = "block";
+        box.innerHTML = `<code>${delivered}</code>`;
+    }
+    
+    if (window.tg?.HapticFeedback) {
+        window.tg.HapticFeedback.notificationOccurred("success");
+    }
+    
+    loadFeatured();
+    loadCatalog();
 }
 
 // ═══════════════════════════════════════════════════
@@ -1442,21 +1452,22 @@ function loadOrders() {
     
     empty.style.display = "none";
     list.innerHTML = STORE_DATA.orders.map(o => {
-        const statusLabels = {
-            pending: "⏳ Ожидание",
-            paid: "✅ Оплачен",
-            failed: "❌ Ошибка",
-            expired: "⌛ Истёк"
+        // Статусы с иконками
+        const statusMap = {
+            pending: `<span style="display:flex;align-items:center;gap:6px;">${ic('clock', 14, '#FFB454')} Ожидание</span>`,
+            paid: `<span style="display:flex;align-items:center;gap:6px;">${ic('check-circle', 14, '#34E7C4')} Оплачен</span>`,
+            failed: `<span style="display:flex;align-items:center;gap:6px;">${ic('x-circle', 14, '#FF5C6A')} Ошибка</span>`,
+            expired: `<span style="display:flex;align-items:center;gap:6px;">${ic('alert-circle', 14, '#FFB454')} Истёк</span>`
         };
         return `
             <div class="order-item glass">
                 <div class="order-top">
                     <span class="order-id">Заказ #${o.id}</span>
-                    <span class="status-badge status-${o.status}">${statusLabels[o.status] || o.status}</span>
+                    <span class="status-badge status-${o.status}">${statusMap[o.status] || o.status}</span>
                 </div>
                 <div class="order-amount">${o.amount} ${o.asset}</div>
                 ${o.delivered_content ? `<div class="order-delivered"><code>${o.delivered_content}</code></div>` : ""}
-                ${o.status === "pending" ? `<span class="order-pay-link">⏳ Ожидает оплаты...</span>` : ""}
+                ${o.status === "pending" ? `<span class="order-pay-link">${ic('send', 16, '#34E7C4')} Ожидает оплаты...</span>` : ""}
             </div>
         `;
     }).join("");
@@ -1484,19 +1495,30 @@ adminTabs.forEach((tab) => {
 });
 
 function loadAdminStats() {
-  const totalOrders = STORE_DATA.orders.length;
-  const paidOrders = STORE_DATA.orders.filter(o => o.status === "paid");
-  const revenue = paidOrders.reduce((sum, o) => sum + o.amount, 0);
-  const totalProducts = STORE_DATA.products.length;
-  
-  document.getElementById("stats-grid").innerHTML = `
-    <div class="stat-card glass"><div class="stat-value">${revenue.toFixed(2)}</div><div class="stat-label">Выручка (USDT)</div></div>
-    <div class="stat-card glass"><div class="stat-value">${paidOrders.length}</div><div class="stat-label">Оплачено заказов</div></div>
-    <div class="stat-card glass"><div class="stat-value">${totalOrders}</div><div class="stat-label">Всего заказов</div></div>
-    <div class="stat-card glass"><div class="stat-value">${totalProducts}</div><div class="stat-label">Товаров</div></div>
-  `;
+    const totalOrders = STORE_DATA.orders.length;
+    const paidOrders = STORE_DATA.orders.filter(o => o.status === "paid");
+    const revenue = paidOrders.reduce((sum, o) => sum + o.amount, 0);
+    const totalProducts = STORE_DATA.products.length;
+    
+    document.getElementById("stats-grid").innerHTML = `
+        <div class="stat-card glass">
+            <div class="stat-value">${revenue.toFixed(2)}</div>
+            <div class="stat-label">${ic('coins', 16, '#34E7C4')} Выручка (USDT)</div>
+        </div>
+        <div class="stat-card glass">
+            <div class="stat-value">${paidOrders.length}</div>
+            <div class="stat-label">${ic('check-circle', 16, '#34E7C4')} Оплачено заказов</div>
+        </div>
+        <div class="stat-card glass">
+            <div class="stat-value">${totalOrders}</div>
+            <div class="stat-label">${ic('file-text', 16, '#8B6CFF')} Всего заказов</div>
+        </div>
+        <div class="stat-card glass">
+            <div class="stat-value">${totalProducts}</div>
+            <div class="stat-label">${ic('package', 16, '#8B6CFF')} Товаров</div>
+        </div>
+    `;
 }
-
 function loadAdminProducts() {
     const products = STORE_DATA.products;
     document.getElementById("admin-product-list").innerHTML = products.map(p => {
