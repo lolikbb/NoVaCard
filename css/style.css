@@ -549,3 +549,191 @@ html, body {
   vertical-align: middle;
   flex-shrink: 0;
 }
+
+/* ═══════════════════════════════════════════════════
+   🎯 ПЛАВНЫЕ АНИМАЦИИ (добавлено поверх твоего кода)
+   ═══════════════════════════════════════════════════ */
+
+/* ═══ Плавное перемещение индикатора навигации ═══ */
+.nav-indicator,
+#nav-indicator,
+.segmented-indicator,
+#admin-indicator {
+    transition: transform 0.35s cubic-bezier(0.5, 1.5, 0.4, 1) !important;
+    will-change: transform;
+}
+
+/* ═══ Плавное появление экранов ═══ */
+.screen {
+    animation: screenFadeIn 0.35s cubic-bezier(0.25, 0.9, 0.35, 1);
+}
+
+@keyframes screenFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ═══ Плавное нажатие для всех интерактивных элементов ═══ */
+.icon-btn,
+.cat-pill,
+.product-card,
+.menu-item,
+.btn-primary,
+.btn-buy,
+.admin-del-btn,
+.blocked-btn,
+.nav-item,
+.segmented-item,
+.order-pay-link {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.2s ease,
+                color 0.25s ease !important;
+    will-change: transform;
+}
+
+/* ═══ Эффект нажатия (уменьшение) ═══ */
+.icon-btn:active,
+.cat-pill:active,
+.product-card:active,
+.menu-item:active,
+.btn-primary:active,
+.btn-buy:active,
+.admin-del-btn:active,
+.blocked-btn:active,
+.nav-item:active {
+    transform: scale(0.94) !important;
+}
+
+/* ═══ Плавное изменение цвета для категорий ═══ */
+.cat-pill {
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* ═══ Плавное появление модальных окон ═══ */
+.sheet-overlay {
+    transition: opacity 0.3s ease !important;
+}
+
+.sheet {
+    transition: transform 0.4s cubic-bezier(0.25, 0.9, 0.35, 1) !important;
+}
+
+/* ═══ Плавное появление админ-панелей ═══ */
+.admin-panel.active {
+    animation: adminPanelFadeIn 0.3s ease;
+}
+
+@keyframes adminPanelFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ═══ Плавное изменение иконок в навигации ═══ */
+.nav-ic {
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                color 0.25s ease !important;
+}
+
+.nav-item.active .nav-ic {
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* ═══ Плавное изменение текста в навигации ═══ */
+.nav-item {
+    transition: color 0.25s ease !important;
+}
+
+/* ═══ Плавное появление карточек товаров ═══ */
+.product-card {
+    animation: cardAppear 0.4s ease backwards;
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Задержки для карточек (эффект каскада) */
+.product-card:nth-child(1) { animation-delay: 0.02s; }
+.product-card:nth-child(2) { animation-delay: 0.06s; }
+.product-card:nth-child(3) { animation-delay: 0.10s; }
+.product-card:nth-child(4) { animation-delay: 0.14s; }
+.product-card:nth-child(5) { animation-delay: 0.18s; }
+.product-card:nth-child(6) { animation-delay: 0.22s; }
+.product-card:nth-child(7) { animation-delay: 0.26s; }
+.product-card:nth-child(8) { animation-delay: 0.30s; }
+.product-card:nth-child(9) { animation-delay: 0.34s; }
+.product-card:nth-child(10) { animation-delay: 0.38s; }
+
+/* ═══ Плавное появление заказов ═══ */
+.order-item {
+    animation: orderAppear 0.3s ease backwards;
+}
+
+@keyframes orderAppear {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.order-item:nth-child(1) { animation-delay: 0.02s; }
+.order-item:nth-child(2) { animation-delay: 0.05s; }
+.order-item:nth-child(3) { animation-delay: 0.08s; }
+.order-item:nth-child(4) { animation-delay: 0.11s; }
+.order-item:nth-child(5) { animation-delay: 0.14s; }
+
+/* ═══ Спиннер (плавное вращение) ═══ */
+.spinner {
+    animation: spin 0.8s linear infinite !important;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ═══ Плавное изменение прозрачности для ссылок ═══ */
+.section-head .link {
+    transition: opacity 0.2s ease !important;
+}
+
+.section-head .link:hover {
+    opacity: 0.7;
+}
+
+.section-head .link:active {
+    opacity: 0.5;
+}
+
+/* ═══ Плавное изменение для кнопки удаления ═══ */
+.admin-del-btn {
+    transition: transform 0.15s ease,
+                background 0.2s ease !important;
+}
+
+.admin-del-btn:active {
+    transform: scale(0.85);
+    background: rgba(255, 92, 106, 0.25);
+}
