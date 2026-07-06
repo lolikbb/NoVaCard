@@ -7,10 +7,442 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   Liquid Glass — сбалансированная версия
+   ═══════════════════════════════════════════════════ */
+
+:root {
+    --glass-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        inset 1.8px 3px 0px -2px rgba(255, 255, 255, 0.27),
+        inset -2px -2px 0px -2px rgba(255, 255, 255, 0.24),
+        inset -3px -8px 1px -6px rgba(255, 255, 255, 0.18),
+        inset -0.3px -1px 4px 0px rgba(0, 0, 0, 0.24),
+        inset -1.5px 2.5px 0px -2px rgba(0, 0, 0, 0.4),
+        inset 0px 3px 4px -2px rgba(0, 0, 0, 0.4),
+        inset 2px -6.5px 1px -4px rgba(0, 0, 0, 0.2),
+        0px 1px 5px 0px rgba(0, 0, 0, 0.2),
+        0px 6px 16px 0px rgba(0, 0, 0, 0.16);
+
+    --glass-shadow-active:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        inset 1px 1px 0 0 rgba(255, 255, 255, 0.15),
+        inset -1px -1px 0 0 rgba(255, 255, 255, 0.1),
+        0 2px 4px rgba(0, 0, 0, 0.15);
+
+    --glass-shadow-indicator:
+        inset 0 0 0 1px #ffffff08,
+        inset 2px 1px 0 -1px #ffffff45,
+        inset -1.5px -1px 0 -1px #ffffff3d,
+        inset -2px -6px 1px -5px #ffffff2e,
+        inset -1px 2px 3px -1px #0006,
+        inset 0 -4px 1px -2px #0003,
+        0 3px 6px #00000029;
+
+    --bg: #000000;
+    --surface: rgba(255, 255, 255, 0.055);
+    --surface-2: rgba(255, 255, 255, 0.09);
+    --stroke: rgba(255, 255, 255, 0.08);
+    --text: #f6f6f8;
+    --text-dim: rgba(246, 246, 248, 0.55);
+    --text-dim2: rgba(246, 246, 248, 0.32);
+    --accent: #8B6CFF;
+    --accent-2: #34E7C4;
+    --accent-grad: linear-gradient(135deg, #8B6CFF 0%, #5B8CFF 100%);
+    --danger: #FF5C6A;
+    --warning: #FFB454;
+    --radius-lg: 28px;
+    --radius-md: 20px;
+    --radius-sm: 14px;
+    --blur: blur(24px) saturate(180%);
+}
+
+.glass {
+    background: var(--surface);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--stroke);
+    box-shadow: var(--glass-shadow);
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: auto;
+}
+
+.glass-active { box-shadow: var(--glass-shadow-active); }
+.glass-indicator { box-shadow: var(--glass-shadow-indicator); }
+
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    height: 100%;
+}
+
+.bg-blobs {
+    position: fixed; inset: 0; z-index: 0;
+    overflow: hidden; pointer-events: none;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.35;
+    animation: float 18s ease-in-out infinite;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.blob-1 { width: 340px; height: 340px; background: #8B6CFF; top: -100px; left: -80px; }
+.blob-2 { width: 300px; height: 300px; background: #34E7C4; top: 40%; right: -100px; animation-delay: -6s; }
+.blob-3 { width: 260px; height: 260px; background: #5B8CFF; bottom: -80px; left: 30%; animation-delay: -12s; }
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -40px) scale(1.1); }
+    66% { transform: translate(-20px, 30px) scale(0.95); }
+}
+
+.app {
+    position: relative; z-index: 1;
+    max-width: 520px; margin: 0 auto;
+    padding: 18px 16px 110px;
+    min-height: 100vh;
+}
+
+.screen { 
+    display: none; 
+    animation: fadeUp 0.35s cubic-bezier(0.25, 0.9, 0.35, 1);
+}
+.screen.active { display: block; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.topbar-user { display: flex; align-items: center; gap: 12px; }
+.avatar, .avatar-lg {
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(139,108,255,0.35), rgba(52,231,196,0.15));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: #fff;
+}
+.avatar { width: 46px; height: 46px; font-size: 17px; }
+.avatar-lg { width: 76px; height: 76px; font-size: 28px; margin: 0 auto 14px; }
+.hello { font-size: 12.5px; color: var(--text-dim); }
+.username { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+.page-title { font-size: 23px; font-weight: 800; letter-spacing: -0.4px; }
+
+.icon-btn {
+    width: 44px; height: 44px; border-radius: 15px;
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.icon-btn:active { transform: scale(0.88); }
+
+.hero-banner {
+    position: relative;
+    border-radius: var(--radius-lg);
+    padding: 28px 22px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    background: linear-gradient(160deg, rgba(139,108,255,0.16), rgba(0,0,0,0.4));
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+.hero-glow {
+    position: absolute; top: -50%; right: -30%;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,108,255,0.5), transparent 70%);
+    filter: blur(10px);
+}
+.hero-content { position: relative; z-index: 1; }
+.hero-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.25; }
+.hero-sub { font-size: 13.5px; color: var(--text-dim); margin-top: 8px; }
+
+.section-head { display: flex; align-items: center; justify-content: space-between; margin: 8px 2px 14px; }
+.section-head h3 { font-size: 16.5px; font-weight: 700; }
+.section-head .link { 
+    font-size: 13px; 
+    color: var(--accent); 
+    font-weight: 600; 
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+.section-head .link:active { opacity: 0.5; }
+
+.cat-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 22px; }
+.cat-pill {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    border-radius: 30px;
+    color: var(--text-dim);
+    font-size: 13.5px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+}
+.cat-pill:active { transform: scale(0.94); }
+.cat-pill.active {
+    color: #fff;
+    background: var(--accent-grad);
+    box-shadow: var(--glass-shadow-active), 0 4px 16px rgba(139,108,255,0.35);
+    border-color: transparent;
+    transform: scale(1);
+}
+
+.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
+.product-card {
+    border-radius: var(--radius-md);
+    padding: 18px 14px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; flex-direction: column; gap: 8px;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+.product-card:active { transform: scale(0.95); }
+.product-emoji { font-size: 30px; }
+.product-title { font-size: 14px; font-weight: 700; line-height: 1.3; min-height: 36px; }
+.stock-badge {
+    align-self: flex-start;
+    font-size: 10.5px; font-weight: 600;
+    color: var(--accent-2);
+    background: rgba(52,231,196,0.1);
+    border: 1px solid rgba(52,231,196,0.25);
+    padding: 3px 9px; border-radius: 20px;
+}
+.stock-badge.out { color: var(--danger); background: rgba(255,92,106,0.1); border-color: rgba(255,92,106,0.25); }
+.product-price { font-size: 16px; font-weight: 800; margin-top: 2px; }
+.product-price span { font-size: 11.5px; color: var(--text-dim); font-weight: 600; }
+
+.empty-state {
+    border-radius: var(--radius-md);
+    padding: 32px 20px;
+    text-align: center;
+    color: var(--text-dim);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    font-size: 13.5px;
+}
+.empty-emoji { font-size: 30px; }
+
+.order-list { display: flex; flex-direction: column; gap: 12px; }
+.order-item { border-radius: var(--radius-md); padding: 16px; }
+.order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.order-id { font-size: 13px; font-weight: 700; color: var(--text-dim); }
+.order-amount { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.order-delivered {
+    margin-top: 10px; padding: 10px 12px;
+    background: rgba(52,231,196,0.08);
+    border: 1px solid rgba(52,231,196,0.2);
+    border-radius: 12px;
+    font-size: 12.5px; word-break: break-all;
+}
+.order-pay-link {
+    display: inline-block; margin-top: 10px;
+    color: var(--accent); font-weight: 700; font-size: 13px;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+.order-pay-link:active { opacity: 0.6; }
+
+.status-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+.status-pending { color: var(--warning); background: rgba(255,180,84,0.12); }
+.status-paid { color: var(--accent-2); background: rgba(52,231,196,0.12); }
+.status-failed, .status-expired { color: var(--danger); background: rgba(255,92,106,0.12); }
+
+.profile-card { border-radius: var(--radius-lg); padding: 32px 20px; text-align: center; margin-bottom: 24px; }
+.profile-name { font-size: 18px; font-weight: 800; }
+.profile-id { font-size: 12.5px; color: var(--text-dim2); margin-top: 4px; }
+
+.menu-list { display: flex; flex-direction: column; gap: 10px; }
+.menu-item {
+    display: flex; align-items: center; gap: 12px;
+    border-radius: var(--radius-md);
+    padding: 15px 16px;
+    font-size: 14.5px; font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.menu-item:active { transform: scale(0.96); }
+.menu-ic {
+    width: 38px; height: 38px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+}
+.chev { margin-left: auto; color: var(--text-dim2); font-size: 18px; }
+
+.bottom-nav {
+    position: fixed; left: 50%; bottom: 16px;
+    transform: translateX(-50%) translateZ(0);
+    -webkit-transform: translateX(-50%) translateZ(0);
+    width: calc(100% - 32px); max-width: 488px;
+    border-radius: 26px;
+    display: flex; padding: 8px;
+    z-index: 50;
+}
+.nav-indicator {
+    position: absolute; top: 8px; bottom: 8px; left: 8px;
+    width: calc((100% - 16px) / 4);
+    background: rgba(255,255,255,0.09);
+    border-radius: 19px;
+    transition: transform 0.35s cubic-bezier(0.5, 1.5, 0.4, 1);
+    will-change: transform;
+    z-index: 0;
+}
+.nav-item {
+    position: relative; z-index: 1; flex: 1;
+    background: none; border: none;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 0 8px;
+    color: var(--text-dim2);
+    font-size: 10.5px; font-weight: 600;
+    cursor: pointer;
+    transition: color 0.25s ease;
+}
+.nav-item.active { color: #fff; }
+.nav-item:active { transform: scale(0.92); }
+.nav-ic { 
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-item.active .nav-ic { 
+    transform: translateY(-2px) scale(1.05);
+    color: var(--accent-2);
+}
+
+.sheet-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: flex-end;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+}
+.sheet-overlay.open { opacity: 1; pointer-events: all; }
+.sheet {
+    width: 100%; max-width: 520px; margin: 0 auto;
+    border-radius: 28px 28px 0 0;
+    padding: 14px 22px 32px;
+    transform: translateY(30px);
+    transition: transform 0.4s cubic-bezier(0.25, 0.9, 0.35, 1);
+}
+.sheet-overlay.open .sheet { transform: translateY(0); }
+.sheet-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px; margin: 0 auto 20px; }
+.sheet-emoji { font-size: 44px; text-align: center; }
+.sheet-title { font-size: 19px; font-weight: 800; text-align: center; margin-top: 10px; }
+.sheet-desc { font-size: 13.5px; color: var(--text-dim); text-align: center; margin-top: 8px; line-height: 1.5; }
+.sheet-price-row { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 18px 0; }
+.sheet-price { font-size: 24px; font-weight: 800; }
+.sheet-stock { font-size: 12px; color: var(--text-dim2); }
+.btn-buy {
+    width: 100%;
+    background: var(--accent-grad);
+    border: none; color: #fff;
+    padding: 17px; border-radius: 18px;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+}
+.btn-buy:active { transform: scale(0.96); }
+.btn-buy:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.pay-status { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 10px 0 4px; }
+.spinner {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.12);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.pay-status-title { font-size: 17px; font-weight: 800; }
+.pay-status-sub { font-size: 13px; color: var(--text-dim); text-align: center; }
+.delivered-box {
+    width: 100%;
+    background: rgba(52,231,196,0.08);
+    border: 1px solid rgba(52,231,196,0.25);
+    border-radius: 14px;
+    padding: 14px; font-size: 13px; word-break: break-all;
+}
+#pay-close { margin-top: 8px; }
+
+/* ═══ Блокировка если не в Telegram ═══ */
+.blocked-screen {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #000;
+    padding: 24px;
+    z-index: 999;
+}
+.blocked-card {
+    max-width: 360px;
+    border-radius: 28px;
+    padding: 40px 28px;
+    text-align: center;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: var(--glass-shadow);
+}
+.blocked-icon { font-size: 48px; margin-bottom: 18px; }
+.blocked-card h1 { font-size: 20px; font-weight: 800; margin-bottom: 12px; color: #fff; }
+.blocked-card p { font-size: 13.5px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 24px; }
+.blocked-btn {
+    display: inline-block;
+    background: var(--accent-grad);
+    color: #fff; text-decoration: none;
+    padding: 14px 28px; border-radius: 16px;
+    font-weight: 700; font-size: 14px;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.blocked-btn:active { transform: scale(0.94); }
+
+::-webkit-scrollbar { display: none; }
+
+.product-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  margin-bottom: 8px;
+  font-size: 28px;
+}
+
+.ic { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+</style>
 </head>
 <body>
+
+<!-- Блокировка если не в Telegram -->
+<div id="blocked-screen" class="blocked-screen" style="display:none">
+  <div class="blocked-card glass">
+    <div class="blocked-icon">🔒</div>
+    <h1>Только через Telegram</h1>
+    <p>Это приложение работает исключительно внутри Telegram-бота.<br>Открой его через кнопку в чате с ботом.</p>
+    <a class="blocked-btn glass-active" href="https://t.me/your_bot_username">Открыть бота</a>
+  </div>
+</div>
 
 <!-- фоновые размытые сферы -->
 <div class="bg-blobs">
@@ -31,12 +463,7 @@
           <div class="username" id="user-name">Гость</div>
         </div>
       </div>
-      <button class="icon-btn glass" id="btn-admin-gear" style="display:none">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
-          <path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.56 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09a1.7 1.7 0 001.55-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34H9a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87V9a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.55 1z"/>
-        </svg>
-      </button>
+      <button class="icon-btn glass" id="btn-admin-gear" style="display:none">⚙️</button>
     </header>
 
     <div class="hero-banner glass">
@@ -62,7 +489,6 @@
     <header class="topbar">
       <h2 class="page-title">Каталог</h2>
     </header>
-
     <div class="cat-scroll" id="cat-scroll-catalog"></div>
     <div class="product-grid" id="catalog-products"></div>
   </section>
@@ -111,24 +537,23 @@
       <h2 class="page-title">Админ-панель</h2>
     </header>
 
-    <div class="segmented glass" id="admin-tabs">
-      <div class="segmented-indicator glass-indicator" id="admin-indicator"></div>
-      <button class="segmented-item active" data-admin-tab="stats">Статистика</button>
-      <button class="segmented-item" data-admin-tab="products">Товары</button>
-      <button class="segmented-item" data-admin-tab="orders">Заказы</button>
+    <div class="segmented glass" id="admin-tabs" style="display:flex;gap:4px;padding:4px;border-radius:18px;margin-bottom:20px;">
+      <button class="segmented-item active" data-admin-tab="stats" style="flex:1;padding:10px 0;background:none;border:none;color:var(--text-dim);font-weight:700;cursor:pointer;border-radius:14px;transition:all 0.2s;">Статистика</button>
+      <button class="segmented-item" data-admin-tab="products" style="flex:1;padding:10px 0;background:none;border:none;color:var(--text-dim);font-weight:700;cursor:pointer;border-radius:14px;transition:all 0.2s;">Товары</button>
+      <button class="segmented-item" data-admin-tab="orders" style="flex:1;padding:10px 0;background:none;border:none;color:var(--text-dim);font-weight:700;cursor:pointer;border-radius:14px;transition:all 0.2s;">Заказы</button>
     </div>
 
     <div class="admin-panel active" id="admin-stats">
-      <div class="stats-grid" id="stats-grid"></div>
+      <div class="stats-grid" id="stats-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"></div>
     </div>
 
-    <div class="admin-panel" id="admin-products">
-      <button class="btn-primary glass-active" id="btn-new-product">+ Добавить товар</button>
-      <div class="admin-list" id="admin-product-list"></div>
+    <div class="admin-panel" id="admin-products" style="display:none;">
+      <button class="btn-primary" id="btn-new-product" style="width:100%;background:var(--accent-grad);border:none;color:#fff;padding:15px;border-radius:20px;font-size:14.5px;font-weight:700;cursor:pointer;margin-bottom:18px;">+ Добавить товар</button>
+      <div class="admin-list" id="admin-product-list" style="display:flex;flex-direction:column;gap:10px;"></div>
     </div>
 
-    <div class="admin-panel" id="admin-orders">
-      <div class="admin-list" id="admin-order-list"></div>
+    <div class="admin-panel" id="admin-orders" style="display:none;">
+      <div class="admin-list" id="admin-order-list" style="display:flex;flex-direction:column;gap:10px;"></div>
     </div>
   </section>
 
@@ -191,18 +616,556 @@
     <div class="pay-status" id="pay-status">
       <div class="spinner" id="pay-spinner"></div>
       <div class="pay-status-title" id="pay-status-title">Ожидание оплаты…</div>
-      <div class="pay-status-sub" id="pay-status-sub">Проверяем платёж в CryptoBot</div>
+      <div class="pay-status-sub" id="pay-status-sub">Имитация оплаты через 3 секунды</div>
       <div class="delivered-box" id="delivered-box" style="display:none"></div>
-      <button class="btn-primary glass-active" id="pay-close">Закрыть</button>
+      <button class="btn-primary glass-active" id="pay-close" style="display:none;width:100%;background:var(--accent-grad);border:none;color:#fff;padding:15px;border-radius:18px;font-size:14.5px;font-weight:700;cursor:pointer;">Закрыть</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════ SCRIPTS ═══════ -->
-<script src="js/guard.js"></script>
-<script src="js/icons.js"></script>
-<script src="js/api.js"></script>
-<script src="js/app.js"></script>
+<script>
+// ═══════════════════════════════════════════════════
+// ПОЛНОСТЬЮ ФРОНТЕНД ВЕРСИЯ — БЕЗ БЭКЕНДА
+// ═══════════════════════════════════════════════════
 
+// ─── TELEGRAM WEBAPP ───
+(function() {
+  const tg = window.Telegram && window.Telegram.WebApp;
+  const hasValidInitData = tg && typeof tg.initData === "string" && tg.initData.length > 20;
+
+  if (!hasValidInitData) {
+    document.getElementById('blocked-screen').style.display = 'flex';
+    throw new Error("Blocked: not opened inside Telegram");
+  }
+
+  tg.ready();
+  tg.expand();
+  tg.setHeaderColor && tg.setHeaderColor("#000000");
+  tg.setBackgroundColor && tg.setBackgroundColor("#000000");
+  window.tg = tg;
+})();
+
+// ─── ДАННЫЕ ───
+const STORE_DATA = {
+  categories: [
+    { id: 1, title: "Подписки", icon: "📺", sort_order: 1 },
+    { id: 2, title: "Игровые ключи", icon: "🎮", sort_order: 2 },
+    { id: 3, title: "Софт", icon: "💻", sort_order: 3 },
+    { id: 4, title: "Аккаунты", icon: "👤", sort_order: 4 },
+    { id: 5, title: "Крипто-товары", icon: "₿", sort_order: 5 },
+  ],
+  products: [
+    { id: 1, category_id: 1, title: "Netflix Premium 1 месяц", description: "Доступ к аккаунту 4K UHD. До 5 устройств одновременно.", price: 4.5, asset: "USDT", type: "subscription", duration_days: 30, icon: "📺", stock: null },
+    { id: 2, category_id: 1, title: "Spotify Premium 3 месяца", description: "Музыка без рекламы, офлайн-режим, высокое качество.", price: 7.99, asset: "USDT", type: "subscription", duration_days: 90, icon: "🎵", stock: null },
+    { id: 3, category_id: 1, title: "YouTube Premium 6 месяцев", description: "Видео без рекламы, фоновый режим, YouTube Music.", price: 12.99, asset: "USDT", type: "subscription", duration_days: 180, icon: "▶️", stock: null },
+    { id: 4, category_id: 2, title: "Steam Gift Card $10", description: "Ключ активации Steam для пополнения баланса.", price: 11, asset: "USDT", type: "key", icon: "🎮", stock: 5 },
+    { id: 5, category_id: 2, title: "Xbox Game Pass Ultimate 1 месяц", description: "Доступ к сотням игр на Xbox и PC.", price: 14.99, asset: "USDT", type: "key", icon: "🎮", stock: 3 },
+    { id: 6, category_id: 2, title: "PlayStation Plus 3 месяца", description: "Игры каждый месяц, онлайн-мультиплеер, скидки.", price: 19.99, asset: "USDT", type: "key", icon: "🎮", stock: 2 },
+    { id: 7, category_id: 3, title: "Windows 11 Pro Key", description: "Лицензионный ключ для Windows 11 Pro.", price: 15, asset: "USDT", type: "key", icon: "💻", stock: 4 },
+    { id: 8, category_id: 3, title: "Adobe Creative Cloud 1 месяц", description: "Photoshop, Premiere, After Effects и все приложения Adobe.", price: 39.99, asset: "USDT", type: "subscription", duration_days: 30, icon: "🎨", stock: null },
+    { id: 9, category_id: 3, title: "Microsoft Office 2021", description: "Word, Excel, PowerPoint, Outlook — постоянная лицензия.", price: 29.99, asset: "USDT", type: "key", icon: "📄", stock: 5 },
+    { id: 10, category_id: 4, title: "ChatGPT Plus аккаунт", description: "Доступ к GPT-4, быстрые ответы, приоритетное обслуживание.", price: 12.99, asset: "USDT", type: "key", icon: "🤖", stock: 3 },
+    { id: 11, category_id: 4, title: "Instagram аккаунт 1000 подписчиков", description: "Готовый аккаунт с реальными подписчиками.", price: 25.99, asset: "USDT", type: "key", icon: "📱", stock: 2 },
+    { id: 12, category_id: 5, title: "Крипто-кошелёк Trust Wallet", description: "Готовый кошелёк с seed-фразой. Мультивалютный.", price: 5.99, asset: "USDT", type: "key", icon: "💰", stock: 5 },
+    { id: 13, category_id: 5, title: "VPN Премиум 1 год", description: "Безопасный доступ к интернету, обход блокировок.", price: 49.99, asset: "USDT", type: "subscription", duration_days: 365, icon: "🔒", stock: null },
+    { id: 14, category_id: 5, title: "NFT коллекция 'CyberPunk'", description: "Уникальный NFT-токен. Ограниченный выпуск.", price: 99.99, asset: "USDT", type: "key", icon: "🖼️", stock: 1 },
+  ],
+  keys: {
+    4: ["STEAM-XXXX-YYYY-ZZZZ", "STEAM-AAAA-BBBB-CCCC", "STEAM-1111-2222-3333", "STEAM-4444-5555-6666", "STEAM-7777-8888-9999"],
+    5: ["XBOX-1234-5678-9012", "XBOX-3456-7890-1234", "XBOX-5678-9012-3456"],
+    6: ["PSN-9999-8888-7777", "PSN-8888-7777-6666"],
+    7: ["WIN11-AAAA-BBBB-CCCC", "WIN11-DDDD-EEEE-FFFF", "WIN11-GGGG-HHHH-IIII", "WIN11-JJJJ-KKKK-LLLL"],
+    9: ["OFFICE-1234-5678-9012", "OFFICE-2345-6789-0123", "OFFICE-3456-7890-1234", "OFFICE-4567-8901-2345", "OFFICE-5678-9012-3456"],
+    10: ["CHATGPT-ABCD-EFGH-IJKL", "CHATGPT-MNOP-QRST-UVWX", "CHATGPT-YZAB-CDEF-GHIJ"],
+    11: ["INSTA-USER-1234-5678", "INSTA-USER-8765-4321"],
+    12: ["WALLET-SEED-12345-67890", "WALLET-SEED-09876-54321", "WALLET-SEED-54321-09876", "WALLET-SEED-67890-12345", "WALLET-SEED-11111-22222"],
+    14: ["NFT-CYBER-9876-5432"],
+  },
+  usedKeys: {},
+  orders: [],
+  nextOrderId: 1,
+};
+
+// ─── СОСТОЯНИЕ ───
+let CURRENT_USER = { 
+  id: 1, 
+  tg_id: 123456789, 
+  username: "user", 
+  first_name: "Пользователь", 
+  is_admin: true 
+};
+let SELECTED_CATEGORY = null;
+let SELECTED_PRODUCT = null;
+let currentScreen = 'home';
+let pollTimer = null;
+
+// ─── УТИЛИТЫ ───
+function getCategory(id) {
+  return STORE_DATA.categories.find(c => c.id === id);
+}
+
+function getProduct(id) {
+  return STORE_DATA.products.find(p => p.id === id);
+}
+
+function getProducts(categoryId) {
+  let products = STORE_DATA.products.filter(p => p.is_active !== false);
+  if (categoryId) {
+    products = products.filter(p => p.category_id === categoryId);
+  }
+  return products;
+}
+
+function getStock(productId) {
+  if (STORE_DATA.usedKeys[productId] === undefined) {
+    STORE_DATA.usedKeys[productId] = [];
+  }
+  const total = (STORE_DATA.keys[productId] || []).length;
+  const used = STORE_DATA.usedKeys[productId]?.length || 0;
+  return total - used;
+}
+
+function getAvailableKey(productId) {
+  const keys = STORE_DATA.keys[productId] || [];
+  const used = STORE_DATA.usedKeys[productId] || [];
+  const available = keys.filter(k => !used.includes(k));
+  return available[0] || null;
+}
+
+// ─── НАВИГАЦИЯ ───
+const navItems = document.querySelectorAll(".nav-item");
+const screens = document.querySelectorAll(".screen");
+const navIndicator = document.getElementById("nav-indicator");
+
+function goTo(target) {
+  if (currentScreen === target) return;
+  
+  navItems.forEach(n => n.classList.toggle("active", n.dataset.target === target));
+  
+  screens.forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  
+  const targetScreen = document.getElementById(`screen-${target}`);
+  if (targetScreen) {
+    targetScreen.style.display = 'block';
+    requestAnimationFrame(() => {
+      targetScreen.classList.add('active');
+    });
+  }
+  
+  const btn = [...navItems].find(n => n.dataset.target === target);
+  if (btn) {
+    const items = [...navItems];
+    const index = items.indexOf(btn);
+    navIndicator.style.width = `calc((100% - 16px) / ${items.length})`;
+    navIndicator.style.transform = `translateX(${index * 100}%)`;
+  }
+  
+  currentScreen = target;
+  
+  if (window.tg?.HapticFeedback) {
+    window.tg.HapticFeedback.impactOccurred("light");
+  }
+  
+  if (target === "orders") loadOrders();
+  if (target === "admin") loadAdminStats();
+}
+
+navItems.forEach(btn => btn.addEventListener("click", () => goTo(btn.dataset.target)));
+document.querySelectorAll("[data-goto]").forEach(el =>
+  el.addEventListener("click", () => goTo(el.dataset.goto))
+);
+
+// ─── ИНИЦИАЛИЗАЦИЯ ───
+function init() {
+  renderUser();
+  renderCategories();
+  loadFeatured();
+  loadCatalog();
+  
+  // Настройка навигации
+  setTimeout(() => {
+    moveNavIndicator(document.querySelector(".nav-item.active"));
+  }, 100);
+}
+
+function moveNavIndicator(btn) {
+  if (!btn) return;
+  const items = [...navItems];
+  const index = items.indexOf(btn);
+  navIndicator.style.width = `calc((100% - 16px) / ${items.length})`;
+  navIndicator.style.transform = `translateX(${index * 100}%)`;
+}
+
+function renderUser() {
+  const name = CURRENT_USER.first_name || CURRENT_USER.username || "Гость";
+  document.getElementById("user-name").textContent = name;
+  document.getElementById("profile-name").textContent = name;
+  document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
+  const initial = name[0]?.toUpperCase() || "U";
+  document.getElementById("avatar").textContent = initial;
+  document.getElementById("avatar-lg").textContent = initial;
+
+  if (CURRENT_USER.is_admin) {
+    document.getElementById("btn-admin-gear").style.display = "flex";
+    document.getElementById("menu-admin").style.display = "flex";
+  }
+}
+
+// ─── КАТЕГОРИИ ───
+function renderCategories() {
+  const html = (activeId) => `
+    <button class="cat-pill glass ${activeId === null ? "active" : ""}" data-cat="">Все</button>
+    ${STORE_DATA.categories.map(c => `
+      <button class="cat-pill glass ${activeId === c.id ? "active" : ""}" data-cat="${c.id}">
+        ${c.icon} ${c.title}
+      </button>
+    `).join("")}
+  `;
+  document.getElementById("cat-scroll-home").innerHTML = html(null);
+  document.getElementById("cat-scroll-catalog").innerHTML = html(SELECTED_CATEGORY);
+
+  document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(btn => {
+    btn.addEventListener("click", () => {
+      SELECTED_CATEGORY = btn.dataset.cat ? Number(btn.dataset.cat) : null;
+      document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadCatalog();
+    });
+  });
+}
+
+// ─── ТОВАРЫ ───
+function productCardHTML(p) {
+  const stock = p.type === "key" ? getStock(p.id) : null;
+  const stockBadge = p.type === "key"
+    ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
+    : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
+  
+  return `
+    <div class="product-card glass" data-id="${p.id}">
+      <div class="product-icon-wrapper">${p.icon || '📦'}</div>
+      <div class="product-title">${p.title}</div>
+      ${stockBadge}
+      <div class="product-price">${p.price} <span>${p.asset}</span></div>
+    </div>
+  `;
+}
+
+function loadFeatured() {
+  const products = getProducts(null).slice(0, 4);
+  document.getElementById("featured-products").innerHTML = products.map(productCardHTML).join("");
+  bindProductCards();
+}
+
+function loadCatalog() {
+  const products = getProducts(SELECTED_CATEGORY);
+  document.getElementById("catalog-products").innerHTML = products.map(productCardHTML).join("") ||
+    `<div class="empty-state glass" style="grid-column:1/-1"><div class="empty-emoji">📭</div>Товаров нет</div>`;
+  bindProductCards();
+}
+
+function bindProductCards() {
+  document.querySelectorAll(".product-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const id = Number(card.dataset.id);
+      SELECTED_PRODUCT = getProduct(id);
+      if (SELECTED_PRODUCT) openProductSheet(SELECTED_PRODUCT);
+    });
+  });
+}
+
+// ─── МОДАЛКА ТОВАРА ───
+const sheetOverlay = document.getElementById("sheet-overlay");
+
+function openProductSheet(p) {
+  const stock = p.type === "key" ? getStock(p.id) : null;
+  document.getElementById("sheet-emoji").textContent = p.icon || '📦';
+  document.getElementById("sheet-title").textContent = p.title;
+  document.getElementById("sheet-desc").textContent = p.description || "Описание товара";
+  document.getElementById("sheet-price").textContent = `${p.price} ${p.asset}`;
+  document.getElementById("sheet-stock").textContent =
+    p.type === "key" ? (stock > 0 ? `В наличии: ${stock}` : "Нет в наличии") : `Длительность: ${p.duration_days || 30} дн`;
+  const buyBtn = document.getElementById("btn-buy");
+  buyBtn.disabled = p.type === "key" && stock === 0;
+  buyBtn.textContent = buyBtn.disabled ? "Нет в наличии" : "Купить через CryptoBot";
+  sheetOverlay.classList.add("open");
+}
+
+sheetOverlay.addEventListener("click", (e) => { 
+  if (e.target === sheetOverlay) sheetOverlay.classList.remove("open"); 
+});
+
+document.getElementById("btn-buy").addEventListener("click", () => {
+  if (!SELECTED_PRODUCT) return;
+  if (window.tg?.HapticFeedback) {
+    window.tg.HapticFeedback.impactOccurred("medium");
+  }
+  
+  const p = SELECTED_PRODUCT;
+  const stock = p.type === "key" ? getStock(p.id) : null;
+  
+  if (p.type === "key" && stock === 0) {
+    if (window.tg?.showAlert) {
+      window.tg.showAlert("Товар закончился!");
+    } else {
+      alert("Товар закончился!");
+    }
+    return;
+  }
+  
+  // Создаём заказ
+  const order = {
+    id: STORE_DATA.nextOrderId++,
+    product_id: p.id,
+    amount: p.price,
+    asset: p.asset,
+    status: "pending",
+    pay_url: null,
+    delivered_content: null,
+    created_at: new Date().toISOString(),
+  };
+  
+  STORE_DATA.orders.push(order);
+  sheetOverlay.classList.remove("open");
+  openPaySheet(order);
+  
+  // Имитация оплаты через 3 секунды
+  setTimeout(() => {
+    finishPayment(order.id);
+  }, 3000);
+});
+
+// ─── ОПЛАТА ───
+const payOverlay = document.getElementById("pay-overlay");
+
+function openPaySheet() {
+  document.getElementById("pay-spinner").style.display = "block";
+  document.getElementById("pay-status-title").textContent = "Ожидание оплаты…";
+  document.getElementById("pay-status-sub").textContent = "Имитация оплаты через 3 секунды";
+  document.getElementById("delivered-box").style.display = "none";
+  document.getElementById("pay-close").style.display = "none";
+  payOverlay.classList.add("open");
+}
+
+document.getElementById("pay-close").addEventListener("click", () => {
+  payOverlay.classList.remove("open");
+  clearTimeout(pollTimer);
+});
+
+function finishPayment(orderId) {
+  const order = STORE_DATA.orders.find(o => o.id === orderId);
+  if (!order || order.status === "paid") return;
+  
+  const product = getProduct(order.product_id);
+  let delivered = null;
+  
+  if (product.type === "key") {
+    const key = getAvailableKey(product.id);
+    if (key) {
+      if (!STORE_DATA.usedKeys[product.id]) {
+        STORE_DATA.usedKeys[product.id] = [];
+      }
+      STORE_DATA.usedKeys[product.id].push(key);
+      delivered = key;
+    } else {
+      delivered = "❌ Ключи закончились, обратитесь в поддержку";
+    }
+  } else if (product.type === "subscription") {
+    delivered = `✅ Подписка «${product.title}» активирована на ${product.duration_days} дней`;
+  }
+  
+  order.status = "paid";
+  order.delivered_content = delivered;
+  order.paid_at = new Date().toISOString();
+  
+  // Показываем результат
+  document.getElementById("pay-spinner").style.display = "none";
+  document.getElementById("pay-close").style.display = "block";
+  document.getElementById("pay-status-title").textContent = "✅ Оплачено!";
+  document.getElementById("pay-status-sub").textContent = "Ваш товар готов";
+  
+  if (delivered) {
+    const box = document.getElementById("delivered-box");
+    box.style.display = "block";
+    box.innerHTML = `<code>${delivered}</code>`;
+  }
+  
+  if (window.tg?.HapticFeedback) {
+    window.tg.HapticFeedback.notificationOccurred("success");
+  }
+  
+  loadFeatured();
+  loadCatalog();
+}
+
+// ─── ЗАКАЗЫ ───
+function loadOrders() {
+  const list = document.getElementById("order-list");
+  const empty = document.getElementById("orders-empty");
+  
+  if (!STORE_DATA.orders.length) {
+    list.innerHTML = "";
+    empty.style.display = "flex";
+    return;
+  }
+  
+  empty.style.display = "none";
+  list.innerHTML = STORE_DATA.orders.map(o => {
+    const statusLabels = {
+      pending: "⏳ Ожидание",
+      paid: "✅ Оплачен",
+      failed: "❌ Ошибка",
+      expired: "⌛ Истёк"
+    };
+    return `
+      <div class="order-item glass">
+        <div class="order-top">
+          <span class="order-id">Заказ #${o.id}</span>
+          <span class="status-badge status-${o.status}">${statusLabels[o.status] || o.status}</span>
+        </div>
+        <div class="order-amount">${o.amount} ${o.asset}</div>
+        ${o.delivered_content ? `<div class="order-delivered"><code>${o.delivered_content}</code></div>` : ""}
+        ${o.status === "pending" ? `<span class="order-pay-link">⏳ Ожидает оплаты...</span>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+
+// ─── АДМИНКА ───
+document.getElementById("btn-admin-gear").addEventListener("click", () => goTo("admin"));
+document.getElementById("menu-admin").addEventListener("click", () => goTo("admin"));
+
+// Вкладки админки
+const adminTabs = document.querySelectorAll("#admin-tabs .segmented-item");
+adminTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    adminTabs.forEach(t => {
+      t.classList.remove("active");
+      t.style.background = "transparent";
+      t.style.color = "var(--text-dim)";
+    });
+    tab.classList.add("active");
+    tab.style.background = "rgba(255,255,255,0.09)";
+    tab.style.color = "#fff";
+    
+    document.querySelectorAll(".admin-panel").forEach(p => p.style.display = "none");
+    document.getElementById(`admin-${tab.dataset.adminTab}`).style.display = "block";
+    
+    if (tab.dataset.adminTab === "products") loadAdminProducts();
+    if (tab.dataset.adminTab === "orders") loadAdminOrders();
+  });
+});
+
+// Активируем первую вкладку
+adminTabs[0].click();
+
+function loadAdminStats() {
+  const totalOrders = STORE_DATA.orders.length;
+  const paidOrders = STORE_DATA.orders.filter(o => o.status === "paid");
+  const revenue = paidOrders.reduce((sum, o) => sum + o.amount, 0);
+  const totalProducts = STORE_DATA.products.length;
+  
+  document.getElementById("stats-grid").innerHTML = `
+    <div class="stat-card glass"><div class="stat-value">${revenue.toFixed(2)}</div><div class="stat-label">Выручка (USDT)</div></div>
+    <div class="stat-card glass"><div class="stat-value">${paidOrders.length}</div><div class="stat-label">Оплачено заказов</div></div>
+    <div class="stat-card glass"><div class="stat-value">${totalOrders}</div><div class="stat-label">Всего заказов</div></div>
+    <div class="stat-card glass"><div class="stat-value">1</div><div class="stat-label">Пользователей</div></div>
+  `;
+}
+
+function loadAdminProducts() {
+  const products = STORE_DATA.products;
+  document.getElementById("admin-product-list").innerHTML = products.map(p => {
+    const stock = p.type === "key" ? getStock(p.id) : "∞";
+    return `
+      <div class="admin-row glass" style="display:flex;align-items:center;gap:12px;border-radius:20px;padding:12px 14px;">
+        <span class="admin-row-emoji" style="font-size:22px;">${p.icon || '📦'}</span>
+        <div class="admin-row-info" style="flex:1;">
+          <div class="admin-row-title" style="font-size:14px;font-weight:700;">${p.title}</div>
+          <div class="admin-row-sub" style="font-size:12px;color:var(--text-dim2);margin-top:2px;">${p.price} ${p.asset} · ${p.type === "key" ? `stock: ${stock}` : `${p.duration_days} дн`}</div>
+        </div>
+        <button class="admin-del-btn" data-id="${p.id}" style="width:30px;height:30px;border-radius:10px;background:rgba(255,92,106,0.12);border:1px solid rgba(255,92,106,0.25);color:var(--danger);font-weight:700;cursor:pointer;">✕</button>
+      </div>
+    `;
+  }).join("");
+  
+  document.querySelectorAll(".admin-del-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (confirm("Удалить товар?")) {
+        const id = Number(btn.dataset.id);
+        STORE_DATA.products = STORE_DATA.products.filter(p => p.id !== id);
+        loadAdminProducts();
+        loadFeatured();
+        loadCatalog();
+      }
+    });
+  });
+}
+
+document.getElementById("btn-new-product").addEventListener("click", () => {
+  const title = prompt("Название товара:");
+  if (!title) return;
+  const price = parseFloat(prompt("Цена в USDT:") || "0");
+  const description = prompt("Описание:") || "";
+  const icon = prompt("Эмодзи иконки (например: 📺, 🎮, 💻):") || "📦";
+  const type = confirm("Это подписка? OK = подписка, Cancel = разовый ключ") ? "subscription" : "key";
+  const duration_days = type === "subscription" ? parseInt(prompt("Срок в днях:") || "30") : null;
+  
+  const newProduct = {
+    id: Math.max(...STORE_DATA.products.map(p => p.id)) + 1,
+    category_id: STORE_DATA.categories[0].id,
+    title,
+    description,
+    price,
+    asset: "USDT",
+    type,
+    duration_days,
+    icon,
+    stock: type === "key" ? 0 : null,
+    is_active: true,
+  };
+  
+  STORE_DATA.products.push(newProduct);
+  loadAdminProducts();
+  loadFeatured();
+  loadCatalog();
+  alert("✅ Товар создан!");
+});
+
+function loadAdminOrders() {
+  document.getElementById("admin-order-list").innerHTML = STORE_DATA.orders.map(o => {
+    const statusLabels = {
+      pending: "⏳ Ожидание",
+      paid: "✅ Оплачен",
+      failed: "❌ Ошибка",
+      expired: "⌛ Истёк"
+    };
+    return `
+      <div class="admin-row glass" style="display:flex;align-items:center;gap:12px;border-radius:20px;padding:12px 14px;">
+        <span class="status-dot-admin" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${o.status === 'paid' ? '#34E7C4' : '#FFB454'};"></span>
+        <div class="admin-row-info" style="flex:1;">
+          <div class="admin-row-title" style="font-size:14px;font-weight:700;">Заказ #${o.id}</div>
+          <div class="admin-row-sub" style="font-size:12px;color:var(--text-dim2);margin-top:2px;">${o.amount} ${o.asset} · ${statusLabels[o.status] || o.status}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+// ─── ПОДДЕРЖКА ───
+document.getElementById("menu-support").addEventListener("click", () => {
+  if (window.tg?.openTelegramLink) {
+    window.tg.openTelegramLink("https://t.me/your_bot_username");
+  } else {
+    window.open("https://t.me/your_bot_username", "_blank");
+  }
+});
+
+// ─── ЗАПУСК ───
+document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
