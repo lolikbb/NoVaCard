@@ -1171,13 +1171,17 @@ function setupIcons() {
 // ПОЛЬЗОВАТЕЛЬ
 // ═══════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════
+// ПОЛЬЗОВАТЕЛЬ (исправленная версия)
+// ═══════════════════════════════════════════════════
+
 function renderUser() {
     const name = CURRENT_USER.first_name || CURRENT_USER.username || "Гость";
     document.getElementById("user-name").textContent = name;
     document.getElementById("profile-name").textContent = name;
     document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
     
-    // Аватарка
+    // Получаем элементы аватара
     const avatarEl = document.getElementById('avatar');
     const avatarLg = document.getElementById('avatar-lg');
     const initial = name[0]?.toUpperCase() || "U";
@@ -1188,38 +1192,51 @@ function renderUser() {
         const tg = window.Telegram?.WebApp;
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const user = tg.initDataUnsafe.user;
-            // Проверяем разные варианты получения фото
+            // Проверяем наличие photo_url
             if (user.photo_url) {
-                avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;">`;
-                avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;">`;
+                avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
                 hasPhoto = true;
+                console.log('✅ Фото загружено из Telegram');
             }
         }
     } catch (e) {
-        console.log('Telegram photo not available');
+        console.log('❌ Ошибка получения фото:', e);
     }
     
     // Если нет фото - показываем инициалы
     if (!hasPhoto) {
+        console.log('ℹ️ Фото не найдено, показываем инициалы');
         avatarEl.textContent = initial;
         avatarLg.textContent = initial;
-        // Добавляем стили для инициалов
+        
+        // Стили для отображения инициалов
         avatarEl.style.display = 'flex';
         avatarEl.style.alignItems = 'center';
         avatarEl.style.justifyContent = 'center';
         avatarEl.style.background = 'linear-gradient(145deg, rgba(139,108,255,0.35), rgba(52,231,196,0.15))';
+        avatarEl.style.fontSize = '17px';
+        avatarEl.style.fontWeight = '800';
+        avatarEl.style.color = '#fff';
+        
         avatarLg.style.display = 'flex';
         avatarLg.style.alignItems = 'center';
         avatarLg.style.justifyContent = 'center';
         avatarLg.style.background = 'linear-gradient(145deg, rgba(139,108,255,0.35), rgba(52,231,196,0.15))';
+        avatarLg.style.fontSize = '28px';
+        avatarLg.style.fontWeight = '800';
+        avatarLg.style.color = '#fff';
     }
 
-    // ✅ ПОКАЗЫВАЕМ АДМИН-ПАНЕЛЬ
-    // Для демонстрации всегда показываем (в продакшене используйте CURRENT_USER.is_admin)
-    const showAdmin = true; // или CURRENT_USER.is_admin
+    // ⭐ ПОКАЗЫВАЕМ АДМИН-ПАНЕЛЬ (всегда для демо)
+    // В продакшене используйте: if (CURRENT_USER.is_admin)
+    const showAdmin = true;
     if (showAdmin) {
-        document.getElementById("btn-admin-gear").style.display = "flex";
-        document.getElementById("menu-admin").style.display = "flex";
+        const gearBtn = document.getElementById("btn-admin-gear");
+        const menuAdmin = document.getElementById("menu-admin");
+        if (gearBtn) gearBtn.style.display = "flex";
+        if (menuAdmin) menuAdmin.style.display = "flex";
+        console.log('✅ Админ-панель активирована');
     }
 }
 
