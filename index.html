@@ -204,7 +204,7 @@ html, body {
 }
 .section-head .link:active { color: var(--accent-2); }
 
-/* ═══ СКРОЛЛ КАТЕГОРИЙ — ИСПРАВЛЕН ═══ */
+/* ═══ СКРОЛЛ КАТЕГОРИЙ — DRAG & SCROLL ═══ */
 .cat-scroll {
     display: flex;
     gap: 10px;
@@ -216,12 +216,17 @@ html, body {
     scroll-behavior: smooth;
     cursor: grab;
     scrollbar-width: none;
+    user-select: none;
 }
 .cat-scroll::-webkit-scrollbar {
     display: none;
 }
-.cat-scroll:active {
+.cat-scroll.dragging {
     cursor: grabbing;
+    scroll-behavior: auto;
+}
+.cat-scroll.dragging .cat-pill {
+    pointer-events: none;
 }
 
 .cat-pill {
@@ -243,6 +248,7 @@ html, body {
     border: 1px solid var(--stroke);
     box-shadow: var(--glass-shadow);
     user-select: none;
+    pointer-events: auto;
 }
 .cat-pill:active { transform: scale(0.94); }
 .cat-pill.active {
@@ -253,13 +259,20 @@ html, body {
 }
 .cat-pill img { width: 18px; height: 18px; }
 
-/* ═══ ТОВАРЫ С АНИМАЦИЕЙ ═══ */
+/* ═══ ТОВАРЫ С ПЛАВНОЙ АНИМАЦИЕЙ ВСЕЙ СЕТКИ ═══ */
 .product-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin-bottom: 6px;
-    min-height: 200px;
+    min-height: 150px;
+    opacity: 1;
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 0.9, 0.35, 1);
+}
+
+.product-grid.fade-out {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
 }
 
 .product-grid .product-card {
@@ -271,34 +284,10 @@ html, body {
     gap: 8px;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     opacity: 1;
 }
 .product-grid .product-card:active { transform: scale(0.95); }
-
-.product-grid .product-card.removing {
-    opacity: 0;
-    transform: scale(0.9) translateY(10px);
-    pointer-events: none;
-}
-
-.product-grid .product-card.adding {
-    animation: cardFadeIn 0.3s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
-}
-
-@keyframes cardFadeIn {
-    from { opacity: 0; transform: translateY(16px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.product-grid .product-card:nth-child(1) { animation-delay: 0.02s; }
-.product-grid .product-card:nth-child(2) { animation-delay: 0.05s; }
-.product-grid .product-card:nth-child(3) { animation-delay: 0.08s; }
-.product-grid .product-card:nth-child(4) { animation-delay: 0.11s; }
-.product-grid .product-card:nth-child(5) { animation-delay: 0.14s; }
-.product-grid .product-card:nth-child(6) { animation-delay: 0.17s; }
-.product-grid .product-card:nth-child(7) { animation-delay: 0.20s; }
-.product-grid .product-card:nth-child(8) { animation-delay: 0.23s; }
 
 .product-icon-wrapper {
     display: flex;
@@ -1108,6 +1097,65 @@ function getAvailableKey(productId) {
 }
 
 // ═══════════════════════════════════════════════════
+// DRAG & SCROLL для категорий
+// ═══════════════════════════════════════════════════
+
+function initDragScroll(container) {
+    if (!container) return;
+
+    let isDragging = false;
+    let startX = 0;
+    let scrollLeft = 0;
+
+    container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        container.classList.add('dragging');
+        startX = e.pageX - container.offsetLeft;
+        scrollLeft = container.scrollLeft;
+        container.style.cursor = 'grabbing';
+    });
+
+    container.addEventListener('mouseleave', () => {
+        if (isDragging) {
+            isDragging = false;
+            container.classList.remove('dragging');
+            container.style.cursor = 'grab';
+        }
+    });
+
+    container.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            container.classList.remove('dragging');
+            container.style.cursor = 'grab';
+        }
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - container.offsetLeft;
+        const walk = (x - startX) * 1.2;
+        container.scrollLeft = scrollLeft - walk;
+    });
+
+    // Touch support
+    let touchStartX = 0;
+    let touchScrollLeft = 0;
+
+    container.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].pageX - container.offsetLeft;
+        touchScrollLeft = container.scrollLeft;
+    }, { passive: true });
+
+    container.addEventListener('touchmove', (e) => {
+        const x = e.touches[0].pageX - container.offsetLeft;
+        const walk = (x - touchStartX) * 1.2;
+        container.scrollLeft = touchScrollLeft - walk;
+    }, { passive: true });
+}
+
+// ═══════════════════════════════════════════════════
 // НАВИГАЦИЯ
 // ═══════════════════════════════════════════════════
 
@@ -1185,7 +1233,7 @@ function setupIcons() {
 }
 
 // ═══════════════════════════════════════════════════
-// ПОЛЬЗОВАТЕЛЬ — ИСПРАВЛЕНАЯ ВЕРСИЯ
+// ПОЛЬЗОВАТЕЛЬ — ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ═══════════════════════════════════════════════════
 
 function renderUser() {
@@ -1198,7 +1246,7 @@ function renderUser() {
     const avatarLg = document.getElementById('avatar-lg');
     const initial = name[0]?.toUpperCase() || "U";
 
-    // Очищаем аватар
+    // Очищаем аватары
     avatarEl.innerHTML = '';
     avatarLg.innerHTML = '';
 
@@ -1225,7 +1273,6 @@ function renderUser() {
         console.log('ℹ️ Фото не найдено, показываем инициалы');
         avatarEl.textContent = initial;
         avatarLg.textContent = initial;
-        // Стили уже заданы в CSS, дополнительно не нужно
     }
 
     // Показываем админ-панель
@@ -1235,7 +1282,6 @@ function renderUser() {
         const menuAdmin = document.getElementById("menu-admin");
         if (gearBtn) gearBtn.style.display = "flex";
         if (menuAdmin) menuAdmin.style.display = "flex";
-        console.log('✅ Админ-панель активирована');
     }
 }
 
@@ -1255,8 +1301,15 @@ function renderCategories() {
         `).join("")}
     `;
 
-    document.getElementById("cat-scroll-home").innerHTML = html(null);
-    document.getElementById("cat-scroll-catalog").innerHTML = html(SELECTED_CATEGORY);
+    const homeContainer = document.getElementById("cat-scroll-home");
+    const catalogContainer = document.getElementById("cat-scroll-catalog");
+
+    homeContainer.innerHTML = html(null);
+    catalogContainer.innerHTML = html(SELECTED_CATEGORY);
+
+    // Инициализация drag & scroll
+    initDragScroll(homeContainer);
+    initDragScroll(catalogContainer);
 
     // Обработчики для HOME
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(btn => {
@@ -1264,7 +1317,7 @@ function renderCategories() {
             const catId = btn.dataset.cat ? Number(btn.dataset.cat) : null;
             document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            animateProductsUpdate('featured-products', getProducts(catId).slice(0, 4));
+            updateProducts('featured-products', getProducts(catId).slice(0, 4));
         });
     });
 
@@ -1274,67 +1327,53 @@ function renderCategories() {
             SELECTED_CATEGORY = btn.dataset.cat ? Number(btn.dataset.cat) : null;
             document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            animateProductsUpdate('catalog-products', getProducts(SELECTED_CATEGORY));
+            updateProducts('catalog-products', getProducts(SELECTED_CATEGORY));
         });
     });
 }
 
 // ═══════════════════════════════════════════════════
-// АНИМИРОВАННОЕ ОБНОВЛЕНИЕ ТОВАРОВ
+// ПЛАВНОЕ ОБНОВЛЕНИЕ ТОВАРОВ (вся сетка целиком)
 // ═══════════════════════════════════════════════════
 
-function animateProductsUpdate(containerId, products) {
+function updateProducts(containerId, products) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Получаем текущие карточки
-    const currentCards = container.querySelectorAll('.product-card');
-    if (currentCards.length > 0) {
-        // Анимируем исчезновение
-        currentCards.forEach((card, i) => {
-            setTimeout(() => {
-                card.classList.add('removing');
-            }, i * 30);
-        });
+    // Плавно скрываем
+    container.classList.add('fade-out');
 
-        // После завершения анимации обновляем
-        setTimeout(() => {
-            renderProducts(container, products);
-        }, 150 + currentCards.length * 30);
-    } else {
-        // Если карточек нет — сразу рендерим
-        renderProducts(container, products);
-    }
-}
+    setTimeout(() => {
+        // Рендерим новые товары
+        if (products.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state glass" style="grid-column:1/-1">
+                    <div style="margin:0 auto 10px;">${ic('package', 48, '#8f8f8f')}</div>
+                    <div>Товаров нет</div>
+                </div>
+            `;
+        } else {
+            container.innerHTML = products.map(p => {
+                const stock = p.type === "key" ? getStock(p.id) : null;
+                const stockBadge = p.type === "key"
+                    ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
+                    : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
 
-function renderProducts(container, products) {
-    if (products.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state glass" style="grid-column:1/-1">
-                <div style="margin:0 auto 10px;">${ic('package', 48, '#8f8f8f')}</div>
-                <div>Товаров нет</div>
-            </div>
-        `;
-        return;
-    }
+                return `
+                    <div class="product-card glass" data-id="${p.id}">
+                        <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
+                        <div class="product-title">${p.title}</div>
+                        ${stockBadge}
+                        <div class="product-price">${p.price} <span>${p.asset}</span></div>
+                    </div>
+                `;
+            }).join("");
+            bindProductCards(container);
+        }
 
-    container.innerHTML = products.map((p, index) => {
-        const stock = p.type === "key" ? getStock(p.id) : null;
-        const stockBadge = p.type === "key"
-            ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
-            : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
-
-        return `
-            <div class="product-card glass adding" data-id="${p.id}" style="animation-delay: ${index * 0.03}s">
-                <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
-                <div class="product-title">${p.title}</div>
-                ${stockBadge}
-                <div class="product-price">${p.price} <span>${p.asset}</span></div>
-            </div>
-        `;
-    }).join("");
-
-    bindProductCards(container);
+        // Плавно показываем
+        container.classList.remove('fade-out');
+    }, 350);
 }
 
 function bindProductCards(container) {
@@ -1353,12 +1392,51 @@ function bindProductCards(container) {
 
 function loadFeatured() {
     const container = document.getElementById("featured-products");
-    renderProducts(container, getProducts(null).slice(0, 4));
+    const products = getProducts(null).slice(0, 4);
+    container.innerHTML = products.map(p => {
+        const stock = p.type === "key" ? getStock(p.id) : null;
+        const stockBadge = p.type === "key"
+            ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
+            : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
+        return `
+            <div class="product-card glass" data-id="${p.id}">
+                <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
+                <div class="product-title">${p.title}</div>
+                ${stockBadge}
+                <div class="product-price">${p.price} <span>${p.asset}</span></div>
+            </div>
+        `;
+    }).join("");
+    bindProductCards(container);
 }
 
 function loadCatalog() {
     const container = document.getElementById("catalog-products");
-    renderProducts(container, getProducts(SELECTED_CATEGORY));
+    const products = getProducts(SELECTED_CATEGORY);
+    if (products.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state glass" style="grid-column:1/-1">
+                <div style="margin:0 auto 10px;">${ic('package', 48, '#8f8f8f')}</div>
+                <div>Товаров нет</div>
+            </div>
+        `;
+    } else {
+        container.innerHTML = products.map(p => {
+            const stock = p.type === "key" ? getStock(p.id) : null;
+            const stockBadge = p.type === "key"
+                ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
+                : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
+            return `
+                <div class="product-card glass" data-id="${p.id}">
+                    <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
+                    <div class="product-title">${p.title}</div>
+                    ${stockBadge}
+                    <div class="product-price">${p.price} <span>${p.asset}</span></div>
+                </div>
+            `;
+        }).join("");
+    }
+    bindProductCards(container);
 }
 
 // ═══════════════════════════════════════════════════
