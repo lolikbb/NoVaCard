@@ -697,7 +697,7 @@ html, body {
 </style>
 </head>
 <body>
-    <!-- ═══ БЛОКИРОВКА (показывается если не в Telegram) ═══ -->
+    <!-- ═══ БЛОКИРОВКА ═══ -->
 <div class="blocked-screen" id="blocked-screen">
   <div class="blocked-card glass">
     <div class="blocked-icon-wrapper">
@@ -904,7 +904,7 @@ html, body {
 
 <script>
 // ═══════════════════════════════════════════════════
-// ICONS.JS — генерация SVG иконок
+// ICONS.JS
 // ═══════════════════════════════════════════════════
 
 const ICON_API = 'https://api.iconify.design';
@@ -931,7 +931,7 @@ function setIcon(element, name, size = 20, color = '#f5f5f5') {
 }
 
 // ═══════════════════════════════════════════════════
-// ПРОВЕРКА TELEGRAM + ИКОНКИ ДЛЯ БЛОКИРОВКИ
+// ПРОВЕРКА TELEGRAM
 // ═══════════════════════════════════════════════════
 
 function setupBlockedIcons() {
@@ -979,7 +979,7 @@ function getTelegramUser() {
         first_name: user.first_name || 'Пользователь',
         last_name: user.last_name || '',
         photo_url: user.photo_url || null,
-        is_admin: false, // По умолчанию false
+        is_admin: false,
       };
     }
   } catch (e) {
@@ -989,34 +989,70 @@ function getTelegramUser() {
 }
 
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// ═══════ СОХРАНЕНИЕ ДАННЫХ В localStorage ═══════
+// ═══════════════════════════════════════════════════
+
+const STORAGE_KEY = 'digital_shop_data';
+
+function saveData() {
+    try {
+        const data = {
+            products: STORE_DATA.products,
+            keys: STORE_DATA.keys,
+            usedKeys: STORE_DATA.usedKeys,
+            orders: STORE_DATA.orders,
+            nextOrderId: STORE_DATA.nextOrderId,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        console.log('✅ Данные сохранены');
+    } catch (e) {
+        console.log('❌ Ошибка сохранения:', e);
+    }
+}
+
+function loadData() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const data = JSON.parse(saved);
+            STORE_DATA.products = data.products || STORE_DATA.products;
+            STORE_DATA.keys = data.keys || STORE_DATA.keys;
+            STORE_DATA.usedKeys = data.usedKeys || {};
+            STORE_DATA.orders = data.orders || [];
+            STORE_DATA.nextOrderId = data.nextOrderId || 1;
+            console.log('✅ Данные загружены из localStorage');
+            return true;
+        }
+    } catch (e) {
+        console.log('❌ Ошибка загрузки данных:', e);
+    }
+    return false;
+}
+
+// ═══════════════════════════════════════════════════
 // ДАННЫЕ
 // ═══════════════════════════════════════════════════
 
-const STORE_DATA = {
-  categories: [
-    { id: 1, title: "Подписки", icon: "clapperboard", sort_order: 1 },
-    { id: 2, title: "Игровые ключи", icon: "gamepad-2", sort_order: 2 },
-    { id: 3, title: "Софт", icon: "monitor", sort_order: 3 },
-    { id: 4, title: "Аккаунты", icon: "users", sort_order: 4 },
-    { id: 5, title: "Крипто-товары", icon: "bitcoin", sort_order: 5 },
-  ],
-  products: [
-    { id: 1, category_id: 1, title: "Netflix Premium 1 месяц", description: "Доступ к аккаунту 4K UHD. До 5 устройств одновременно.", price: 4.5, asset: "USDT", type: "subscription", duration_days: 30, icon: "tv" },
-    { id: 2, category_id: 1, title: "Spotify Premium 3 месяца", description: "Музыка без рекламы, офлайн-режим, высокое качество.", price: 7.99, asset: "USDT", type: "subscription", duration_days: 90, icon: "music" },
-    { id: 3, category_id: 1, title: "YouTube Premium 6 месяцев", description: "Видео без рекламы, фоновый режим, YouTube Music.", price: 12.99, asset: "USDT", type: "subscription", duration_days: 180, icon: "youtube" },
-    { id: 4, category_id: 2, title: "Steam Gift Card $10", description: "Ключ активации Steam для пополнения баланса.", price: 11, asset: "USDT", type: "key", icon: "gamepad-2" },
-    { id: 5, category_id: 2, title: "Xbox Game Pass Ultimate 1 месяц", description: "Доступ к сотням игр на Xbox и PC.", price: 14.99, asset: "USDT", type: "key", icon: "controller" },
-    { id: 6, category_id: 2, title: "PlayStation Plus 3 месяца", description: "Игры каждый месяц, онлайн-мультиплеер, скидки.", price: 19.99, asset: "USDT", type: "key", icon: "play" },
-    { id: 7, category_id: 3, title: "Windows 11 Pro Key", description: "Лицензионный ключ для Windows 11 Pro.", price: 15, asset: "USDT", type: "key", icon: "monitor" },
-    { id: 8, category_id: 3, title: "Adobe Creative Cloud 1 месяц", description: "Photoshop, Premiere, After Effects и все приложения Adobe.", price: 39.99, asset: "USDT", type: "subscription", duration_days: 30, icon: "palette" },
-    { id: 9, category_id: 3, title: "Microsoft Office 2021", description: "Word, Excel, PowerPoint, Outlook — постоянная лицензия.", price: 29.99, asset: "USDT", type: "key", icon: "file-text" },
-    { id: 10, category_id: 4, title: "ChatGPT Plus аккаунт", description: "Доступ к GPT-4, быстрые ответы, приоритетное обслуживание.", price: 12.99, asset: "USDT", type: "key", icon: "bot" },
-    { id: 11, category_id: 4, title: "Instagram аккаунт 1000 подписчиков", description: "Готовый аккаунт с реальными подписчиками.", price: 25.99, asset: "USDT", type: "key", icon: "instagram" },
-    { id: 12, category_id: 5, title: "Крипто-кошелёк Trust Wallet", description: "Готовый кошелёк с seed-фразой. Мультивалютный.", price: 5.99, asset: "USDT", type: "key", icon: "wallet" },
-    { id: 13, category_id: 5, title: "VPN Премиум 1 год", description: "Безопасный доступ к интернету, обход блокировок.", price: 49.99, asset: "USDT", type: "subscription", duration_days: 365, icon: "shield" },
-    { id: 14, category_id: 5, title: "NFT коллекция 'CyberPunk'", description: "Уникальный NFT-токен. Ограниченный выпуск.", price: 99.99, asset: "USDT", type: "key", icon: "image" },
-  ],
-  keys: {
+const DEFAULT_PRODUCTS = [
+    { id: 1, category_id: 1, title: "Netflix Premium 1 месяц", description: "Доступ к аккаунту 4K UHD. До 5 устройств одновременно.", price: 4.5, asset: "USDT", type: "subscription", duration_days: 30, icon: "tv", is_active: true },
+    { id: 2, category_id: 1, title: "Spotify Premium 3 месяца", description: "Музыка без рекламы, офлайн-режим, высокое качество.", price: 7.99, asset: "USDT", type: "subscription", duration_days: 90, icon: "music", is_active: true },
+    { id: 3, category_id: 1, title: "YouTube Premium 6 месяцев", description: "Видео без рекламы, фоновый режим, YouTube Music.", price: 12.99, asset: "USDT", type: "subscription", duration_days: 180, icon: "youtube", is_active: true },
+    { id: 4, category_id: 2, title: "Steam Gift Card $10", description: "Ключ активации Steam для пополнения баланса.", price: 11, asset: "USDT", type: "key", icon: "gamepad-2", is_active: true },
+    { id: 5, category_id: 2, title: "Xbox Game Pass Ultimate 1 месяц", description: "Доступ к сотням игр на Xbox и PC.", price: 14.99, asset: "USDT", type: "key", icon: "controller", is_active: true },
+    { id: 6, category_id: 2, title: "PlayStation Plus 3 месяца", description: "Игры каждый месяц, онлайн-мультиплеер, скидки.", price: 19.99, asset: "USDT", type: "key", icon: "play", is_active: true },
+    { id: 7, category_id: 3, title: "Windows 11 Pro Key", description: "Лицензионный ключ для Windows 11 Pro.", price: 15, asset: "USDT", type: "key", icon: "monitor", is_active: true },
+    { id: 8, category_id: 3, title: "Adobe Creative Cloud 1 месяц", description: "Photoshop, Premiere, After Effects и все приложения Adobe.", price: 39.99, asset: "USDT", type: "subscription", duration_days: 30, icon: "palette", is_active: true },
+    { id: 9, category_id: 3, title: "Microsoft Office 2021", description: "Word, Excel, PowerPoint, Outlook — постоянная лицензия.", price: 29.99, asset: "USDT", type: "key", icon: "file-text", is_active: true },
+    { id: 10, category_id: 4, title: "ChatGPT Plus аккаунт", description: "Доступ к GPT-4, быстрые ответы, приоритетное обслуживание.", price: 12.99, asset: "USDT", type: "key", icon: "bot", is_active: true },
+    { id: 11, category_id: 4, title: "Instagram аккаунт 1000 подписчиков", description: "Готовый аккаунт с реальными подписчиками.", price: 25.99, asset: "USDT", type: "key", icon: "instagram", is_active: true },
+    { id: 12, category_id: 5, title: "Крипто-кошелёк Trust Wallet", description: "Готовый кошелёк с seed-фразой. Мультивалютный.", price: 5.99, asset: "USDT", type: "key", icon: "wallet", is_active: true },
+    { id: 13, category_id: 5, title: "VPN Премиум 1 год", description: "Безопасный доступ к интернету, обход блокировок.", price: 49.99, asset: "USDT", type: "subscription", duration_days: 365, icon: "shield", is_active: true },
+    { id: 14, category_id: 5, title: "NFT коллекция 'CyberPunk'", description: "Уникальный NFT-токен. Ограниченный выпуск.", price: 99.99, asset: "USDT", type: "key", icon: "image", is_active: true },
+];
+
+const DEFAULT_KEYS = {
     4: ["STEAM-XXXX-YYYY-ZZZZ", "STEAM-AAAA-BBBB-CCCC", "STEAM-1111-2222-3333", "STEAM-4444-5555-6666", "STEAM-7777-8888-9999"],
     5: ["XBOX-1234-5678-9012", "XBOX-3456-7890-1234", "XBOX-5678-9012-3456"],
     6: ["PSN-9999-8888-7777", "PSN-8888-7777-6666"],
@@ -1026,11 +1062,35 @@ const STORE_DATA = {
     11: ["INSTA-USER-1234-5678", "INSTA-USER-8765-4321"],
     12: ["WALLET-SEED-12345-67890", "WALLET-SEED-09876-54321", "WALLET-SEED-54321-09876", "WALLET-SEED-67890-12345", "WALLET-SEED-11111-22222"],
     14: ["NFT-CYBER-9876-5432"],
-  },
+};
+
+const STORE_DATA = {
+  categories: [
+    { id: 1, title: "Подписки", icon: "clapperboard", sort_order: 1 },
+    { id: 2, title: "Игровые ключи", icon: "gamepad-2", sort_order: 2 },
+    { id: 3, title: "Софт", icon: "monitor", sort_order: 3 },
+    { id: 4, title: "Аккаунты", icon: "users", sort_order: 4 },
+    { id: 5, title: "Крипто-товары", icon: "bitcoin", sort_order: 5 },
+  ],
+  products: [...DEFAULT_PRODUCTS],
+  keys: { ...DEFAULT_KEYS },
   usedKeys: {},
   orders: [],
   nextOrderId: 1,
 };
+
+// Загружаем сохранённые данные
+const dataLoaded = loadData();
+
+// Если данных нет — создаём дефолтные
+if (!dataLoaded) {
+    STORE_DATA.products = [...DEFAULT_PRODUCTS];
+    STORE_DATA.keys = { ...DEFAULT_KEYS };
+    STORE_DATA.usedKeys = {};
+    STORE_DATA.orders = [];
+    STORE_DATA.nextOrderId = 1;
+    saveData();
+}
 
 // ═══════════════════════════════════════════════════
 // СОСТОЯНИЕ
@@ -1039,16 +1099,16 @@ const STORE_DATA = {
 const tgUser = getTelegramUser();
 
 // ⭐ СПИСОК АДМИНОВ (Telegram ID)
-const ADMIN_IDS = [6997844740]; // Добавьте сюда ID админов
+const ADMIN_IDS = [123456789, 987654321];
 
 const CURRENT_USER = {
-  id: tgUser?.id || 6997844740,
-  tg_id: tgUser?.id || 6997844740,
+  id: tgUser?.id || 123456789,
+  tg_id: tgUser?.id || 123456789,
   username: tgUser?.username || 'user',
   first_name: tgUser?.first_name || 'Пользователь',
   last_name: tgUser?.last_name || '',
   photo_url: tgUser?.photo_url || null,
-  is_admin: ADMIN_IDS.includes(tgUser?.id || 6997844740),
+  is_admin: ADMIN_IDS.includes(tgUser?.id || 123456789),
 };
 
 let SELECTED_CATEGORY = null;
@@ -1135,7 +1195,6 @@ function initDragScroll(container) {
         container.scrollLeft = scrollLeft - walk;
     });
 
-    // Touch support
     let touchStartX = 0;
     let touchScrollLeft = 0;
 
@@ -1255,7 +1314,6 @@ function renderUser() {
                 avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
                 avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
                 hasPhoto = true;
-                console.log('✅ Фото загружено из Telegram');
             }
         }
     } catch (e) {
@@ -1263,12 +1321,11 @@ function renderUser() {
     }
 
     if (!hasPhoto) {
-        console.log('ℹ️ Фото не найдено, показываем инициалы');
         avatarEl.textContent = initial;
         avatarLg.textContent = initial;
     }
 
-    // ⭐ ПОКАЗЫВАЕМ АДМИН-ПАНЕЛЬ ТОЛЬКО ДЛЯ АДМИНОВ
+    // ⭐ АДМИН-ПАНЕЛЬ ТОЛЬКО ДЛЯ АДМИНОВ
     const showAdmin = CURRENT_USER.is_admin;
     const gearBtn = document.getElementById("btn-admin-gear");
     const menuAdmin = document.getElementById("menu-admin");
@@ -1276,11 +1333,9 @@ function renderUser() {
     if (showAdmin) {
         if (gearBtn) gearBtn.style.display = "flex";
         if (menuAdmin) menuAdmin.style.display = "flex";
-        console.log('✅ Админ-панель активирована для пользователя', CURRENT_USER.tg_id);
     } else {
         if (gearBtn) gearBtn.style.display = "none";
         if (menuAdmin) menuAdmin.style.display = "none";
-        console.log('❌ Админ-панель скрыта для пользователя', CURRENT_USER.tg_id);
     }
 }
 
@@ -1306,37 +1361,32 @@ function renderCategories() {
     homeContainer.innerHTML = html(null);
     catalogContainer.innerHTML = html(SELECTED_CATEGORY);
 
-    // Инициализация drag & scroll
     initDragScroll(homeContainer);
     initDragScroll(catalogContainer);
 
-    // ⭐ Обработчики для HOME — ИСПРАВЛЕНЫ
+    // ⭐ Обработчики для HOME
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(btn => {
         btn.addEventListener("click", function(e) {
             e.stopPropagation();
             const catId = this.dataset.cat ? Number(this.dataset.cat) : null;
             
-            // Обновляем активный класс
             document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
             this.classList.add("active");
             
-            // Обновляем товары
             const products = getProducts(catId).slice(0, 4);
             updateProducts('featured-products', products);
         });
     });
 
-    // ⭐ Обработчики для CATALOG — ИСПРАВЛЕНЫ
+    // ⭐ Обработчики для CATALOG
     document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(btn => {
         btn.addEventListener("click", function(e) {
             e.stopPropagation();
             SELECTED_CATEGORY = this.dataset.cat ? Number(this.dataset.cat) : null;
             
-            // Обновляем активный класс
             document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
             this.classList.add("active");
             
-            // Обновляем товары
             const products = getProducts(SELECTED_CATEGORY);
             updateProducts('catalog-products', products);
         });
@@ -1502,9 +1552,11 @@ document.getElementById("btn-buy").addEventListener("click", () => {
     pay_url: null,
     delivered_content: null,
     created_at: new Date().toISOString(),
+    user_id: CURRENT_USER.tg_id,
   };
 
   STORE_DATA.orders.push(order);
+  saveData(); // ⭐ СОХРАНЯЕМ
   sheetOverlay.classList.remove("open");
   openPaySheet(order);
 
@@ -1559,6 +1611,7 @@ function finishPayment(orderId) {
     order.status = "paid";
     order.delivered_content = delivered;
     order.paid_at = new Date().toISOString();
+    saveData(); // ⭐ СОХРАНЯЕМ
 
     document.getElementById("pay-spinner").style.display = "none";
     document.getElementById("pay-close").style.display = "block";
@@ -1583,21 +1636,24 @@ function finishPayment(orderId) {
 }
 
 // ═══════════════════════════════════════════════════
-// ЗАКАЗЫ
+// ЗАКАЗЫ (только свои)
 // ═══════════════════════════════════════════════════
 
 function loadOrders() {
     const list = document.getElementById("order-list");
     const empty = document.getElementById("orders-empty");
 
-    if (!STORE_DATA.orders.length) {
+    // Фильтруем заказы только текущего пользователя
+    const userOrders = STORE_DATA.orders.filter(o => o.user_id === CURRENT_USER.tg_id);
+
+    if (!userOrders.length) {
         list.innerHTML = "";
         empty.style.display = "block";
         return;
     }
 
     empty.style.display = "none";
-    list.innerHTML = STORE_DATA.orders.map(o => {
+    list.innerHTML = userOrders.map(o => {
         const statusMap = {
             pending: `<span style="display:flex;align-items:center;gap:6px;">${ic('clock', 14, '#FFB454')} Ожидание</span>`,
             paid: `<span style="display:flex;align-items:center;gap:6px;">${ic('check-circle', 14, '#34E7C4')} Оплачен</span>`,
@@ -1664,6 +1720,7 @@ function loadAdminStats() {
         </div>
     `;
 }
+
 function loadAdminProducts() {
     const products = STORE_DATA.products;
     document.getElementById("admin-product-list").innerHTML = products.map(p => {
@@ -1685,6 +1742,7 @@ function loadAdminProducts() {
             if (confirm("Удалить товар?")) {
                 const id = Number(btn.dataset.id);
                 STORE_DATA.products = STORE_DATA.products.filter(p => p.id !== id);
+                saveData();
                 loadAdminProducts();
                 loadFeatured();
                 loadCatalog();
@@ -1703,7 +1761,7 @@ document.getElementById("btn-new-product").addEventListener("click", () => {
   const duration_days = type === "subscription" ? parseInt(prompt("Срок в днях:") || "30") : null;
 
   const newProduct = {
-    id: Math.max(...STORE_DATA.products.map(p => p.id)) + 1,
+    id: Math.max(...STORE_DATA.products.map(p => p.id), 0) + 1,
     category_id: STORE_DATA.categories[0].id,
     title,
     description,
@@ -1716,6 +1774,7 @@ document.getElementById("btn-new-product").addEventListener("click", () => {
   };
 
   STORE_DATA.products.push(newProduct);
+  saveData();
   loadAdminProducts();
   loadFeatured();
   loadCatalog();
@@ -1738,7 +1797,7 @@ function loadAdminOrders() {
       <div class="admin-row glass">
         <span class="status-dot ${o.status}"></span>
         <div class="admin-row-info">
-          <div class="admin-row-title">Заказ #${o.id}</div>
+          <div class="admin-row-title">Заказ #${o.id} (User: ${o.user_id || '?'})</div>
           <div class="admin-row-sub">${o.amount} ${o.asset} · ${statusLabels[o.status] || o.status}</div>
         </div>
       </div>
@@ -1768,9 +1827,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCategories();
     loadFeatured();
     loadCatalog();
-    if (STORE_DATA.orders.length) {
-        loadOrders();
-    }
+    loadOrders();
 
     setTimeout(() => {
         moveNavIndicator(document.querySelector(".nav-item.active"));
