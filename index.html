@@ -10,7 +10,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════
-   Liquid Glass — сбалансированная версия
+   Liquid Glass — полная версия
    ═══════════════════════════════════════════════════ */
 
 :root {
@@ -50,9 +50,6 @@
     --text-dim2: rgba(246, 246, 248, 0.32);
     --accent: #8B6CFF;
     --accent-2: #34E7C4;
-    --accent-grad: linear-gradient(135deg, #8B6CFF 0%, #5B8CFF 100%);
-    --danger: #FF5C6A;
-    --warning: #FFB454;
     --radius-lg: 28px;
     --radius-md: 20px;
     --radius-sm: 14px;
@@ -67,7 +64,6 @@
     box-shadow: var(--glass-shadow);
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    will-change: auto;
 }
 
 .glass-active { box-shadow: var(--glass-shadow-active); }
@@ -142,7 +138,9 @@ html, body {
     background: linear-gradient(145deg, rgba(139,108,255,0.35), rgba(52,231,196,0.15));
     display: flex; align-items: center; justify-content: center;
     font-weight: 800; color: #fff;
+    overflow: hidden;
 }
+.avatar img, .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
 .avatar { width: 46px; height: 46px; font-size: 17px; }
 .avatar-lg { width: 76px; height: 76px; font-size: 28px; margin: 0 auto 14px; }
 .hello { font-size: 12.5px; color: var(--text-dim); }
@@ -155,8 +153,14 @@ html, body {
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: var(--surface);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--stroke);
+    box-shadow: var(--glass-shadow);
 }
 .icon-btn:active { transform: scale(0.88); }
+.icon-btn img { width: 20px; height: 20px; }
 
 .hero-banner {
     position: relative;
@@ -182,12 +186,12 @@ html, body {
 .section-head h3 { font-size: 16.5px; font-weight: 700; }
 .section-head .link { 
     font-size: 13px; 
-    color: var(--accent); 
+    color: var(--text-dim); 
     font-weight: 600; 
     cursor: pointer;
-    transition: opacity 0.2s ease;
+    transition: color 0.2s ease;
 }
-.section-head .link:active { opacity: 0.5; }
+.section-head .link:active { color: var(--accent-2); }
 
 .cat-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 22px; }
 .cat-pill {
@@ -199,15 +203,18 @@ html, body {
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 .cat-pill:active { transform: scale(0.94); }
 .cat-pill.active {
     color: #fff;
-    background: var(--accent-grad);
-    box-shadow: var(--glass-shadow-active), 0 4px 16px rgba(139,108,255,0.35);
-    border-color: transparent;
-    transform: scale(1);
+    background: var(--surface-2);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: var(--glass-shadow-active);
 }
+.cat-pill img { width: 18px; height: 18px; }
 
 .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
 .product-card {
@@ -220,7 +227,17 @@ html, body {
     -webkit-transform: translateZ(0);
 }
 .product-card:active { transform: scale(0.95); }
-.product-emoji { font-size: 30px; }
+.product-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    margin-bottom: 8px;
+}
+.product-icon-wrapper img { width: 28px; height: 28px; }
 .product-title { font-size: 14px; font-weight: 700; line-height: 1.3; min-height: 36px; }
 .stock-badge {
     align-self: flex-start;
@@ -258,7 +275,7 @@ html, body {
 }
 .order-pay-link {
     display: inline-block; margin-top: 10px;
-    color: var(--accent); font-weight: 700; font-size: 13px;
+    color: var(--accent-2); font-weight: 700; font-size: 13px;
     text-decoration: none;
     transition: opacity 0.2s ease;
 }
@@ -286,8 +303,10 @@ html, body {
 .menu-ic {
     width: 38px; height: 38px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 17px; flex-shrink: 0;
+    flex-shrink: 0;
+    background: var(--surface-2);
 }
+.menu-ic img { width: 20px; height: 20px; }
 .chev { margin-left: auto; color: var(--text-dim2); font-size: 18px; }
 
 .bottom-nav {
@@ -325,8 +344,8 @@ html, body {
 }
 .nav-item.active .nav-ic { 
     transform: translateY(-2px) scale(1.05);
-    color: var(--accent-2);
 }
+.nav-item img { width: 22px; height: 22px; }
 
 .sheet-overlay {
     position: fixed; inset: 0;
@@ -347,7 +366,17 @@ html, body {
 }
 .sheet-overlay.open .sheet { transform: translateY(0); }
 .sheet-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px; margin: 0 auto 20px; }
-.sheet-emoji { font-size: 44px; text-align: center; }
+.sheet-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: var(--surface-2);
+    margin: 0 auto 10px;
+}
+.sheet-icon-wrapper img { width: 40px; height: 40px; }
 .sheet-title { font-size: 19px; font-weight: 800; text-align: center; margin-top: 10px; }
 .sheet-desc { font-size: 13.5px; color: var(--text-dim); text-align: center; margin-top: 8px; line-height: 1.5; }
 .sheet-price-row { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 18px 0; }
@@ -355,12 +384,14 @@ html, body {
 .sheet-stock { font-size: 12px; color: var(--text-dim2); }
 .btn-buy {
     width: 100%;
-    background: var(--accent-grad);
-    border: none; color: #fff;
+    background: var(--surface-2);
+    border: 1px solid var(--stroke);
+    color: #fff;
     padding: 17px; border-radius: 18px;
     font-size: 15px; font-weight: 700;
     cursor: pointer;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+    box-shadow: var(--glass-shadow-active);
 }
 .btn-buy:active { transform: scale(0.96); }
 .btn-buy:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
@@ -369,7 +400,7 @@ html, body {
 .spinner {
     width: 44px; height: 44px; border-radius: 50%;
     border: 3px solid rgba(255,255,255,0.12);
-    border-top-color: var(--accent);
+    border-top-color: var(--accent-2);
     animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -382,49 +413,287 @@ html, body {
     border-radius: 14px;
     padding: 14px; font-size: 13px; word-break: break-all;
 }
-#pay-close { margin-top: 8px; }
-
+.btn-close {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--stroke);
+    color: #fff;
+    padding: 17px; border-radius: 18px;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: var(--glass-shadow-active);
+    margin-top: 8px;
+}
+.btn-close:active { transform: scale(0.96); }
 
 ::-webkit-scrollbar { display: none; }
 
-.product-icon-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.06);
-  margin-bottom: 8px;
-  font-size: 28px;
+/* ═══ Админка (в стиле glass) ═══ */
+.admin-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 18px;
+    margin-bottom: 20px;
+}
+.admin-tab {
+    flex: 1;
+    padding: 10px 0;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 14px;
+    transition: all 0.2s ease;
+}
+.admin-tab.active {
+    color: #fff;
+    background: var(--surface-2);
+    box-shadow: var(--glass-shadow-active);
+}
+.admin-tab:active { transform: scale(0.96); }
+
+.admin-panel { display: none; }
+.admin-panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat-card { border-radius: var(--radius-md); padding: 20px 16px; }
+.stat-value { font-size: 24px; font-weight: 800; }
+.stat-label { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+
+.btn-primary {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--stroke);
+    color: #fff;
+    padding: 15px;
+    border-radius: var(--radius-md);
+    font-size: 14.5px; font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 18px;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: var(--glass-shadow-active);
+}
+.btn-primary:active { transform: scale(0.96); }
+
+.admin-list { display: flex; flex-direction: column; gap: 10px; }
+.admin-row {
+    display: flex; align-items: center; gap: 12px;
+    border-radius: var(--radius-md); padding: 12px 14px;
+}
+.admin-row-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    flex-shrink: 0;
+}
+.admin-row-icon img { width: 20px; height: 20px; }
+.admin-row-info { flex: 1; }
+.admin-row-title { font-size: 14px; font-weight: 700; }
+.admin-row-sub { font-size: 12px; color: var(--text-dim2); margin-top: 2px; }
+.admin-del-btn {
+    width: 30px; height: 30px; border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--stroke);
+    color: var(--text-dim);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.admin-del-btn:active { transform: scale(0.85); color: var(--danger); }
+.admin-del-btn img { width: 16px; height: 16px; }
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.status-dot.pending { background: var(--warning); }
+.status-dot.paid { background: var(--accent-2); }
+.status-dot.failed, .status-dot.expired { background: var(--danger); }
+
+/* ═══ БЛОКИРОВКА ═══ */
+.blocked-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    padding: 24px;
+    z-index: 999;
+}
+.blocked-screen.hidden { display: none; }
+
+.blocked-card {
+    max-width: 400px;
+    width: 100%;
+    border-radius: var(--radius-lg);
+    padding: 48px 32px 40px;
+    text-align: center;
 }
 
-.ic { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+.blocked-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--stroke);
+    box-shadow: var(--glass-shadow-active);
+}
+.blocked-icon-wrapper img { width: 44px; height: 44px; }
+
+.blocked-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+.blocked-sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+.blocked-sub strong { color: var(--accent-2); font-weight: 600; }
+
+.blocked-divider {
+    width: 40px;
+    height: 2px;
+    background: var(--surface-2);
+    margin: 16px auto;
+    border-radius: 4px;
+}
+
+.blocked-features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 16px 0 28px;
+}
+.blocked-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid var(--stroke);
+}
+.blocked-feature img { width: 18px; height: 18px; flex-shrink: 0; }
+.blocked-feature span { font-size: 13px; color: var(--text-dim); }
+
+.blocked-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.blocked-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-decoration: none;
+    border: none;
+}
+.blocked-btn:active { transform: scale(0.96); }
+.blocked-btn img { width: 20px; height: 20px; }
+
+.blocked-btn-primary {
+    background: var(--surface-2);
+    border: 1px solid var(--stroke);
+    color: #fff;
+    box-shadow: var(--glass-shadow-active);
+}
+.blocked-btn-secondary {
+    background: transparent;
+    border: 1px solid var(--stroke);
+    color: var(--text-dim);
+}
+
+.app.hidden { display: none; }
 </style>
 </head>
 <body>
+    <!-- ═══ БЛОКИРОВКА (показывается если не в Telegram) ═══ -->
+<div class="blocked-screen" id="blocked-screen">
+  <div class="blocked-card glass">
+    <div class="blocked-icon-wrapper">
+      <img src="" alt="telegram" id="blocked-icon">
+    </div>
+    <div class="blocked-title">Только через Telegram</div>
+    <div class="blocked-sub">
+      Приложение работает внутри <strong>Telegram</strong>.<br>
+      Открой его через кнопку в чате с ботом.
+    </div>
+    <div class="blocked-divider"></div>
+    <div class="blocked-features">
+      <div class="blocked-feature">
+        <img src="" alt="shield" id="feature-shield">
+        <span>Безопасные платежи через CryptoBot</span>
+      </div>
+      <div class="blocked-feature">
+        <img src="" alt="bolt" id="feature-bolt">
+        <span>Мгновенная выдача товаров</span>
+      </div>
+      <div class="blocked-feature">
+        <img src="" alt="users" id="feature-users">
+        <span>Присоединяйся к нашему сообществу!</span>
+      </div>
+    </div>
+    <div class="blocked-buttons">
+      <a class="blocked-btn blocked-btn-primary" href="https://t.me/MySuperBot" target="_blank">
+        <img src="" alt="send" id="btn-send-icon"> Открыть бота в Telegram
+      </a>
+      <a class="blocked-btn blocked-btn-secondary" href="https://t.me/MyChannel" target="_blank">
+        <img src="" alt="users" id="btn-users-icon"> Наш канал
+      </a>
+    </div>
+  </div>
+</div>
 
-
-<!-- фоновые размытые сферы -->
 <div class="bg-blobs">
   <span class="blob blob-1"></span>
   <span class="blob blob-2"></span>
   <span class="blob blob-3"></span>
 </div>
 
-<div class="app" id="app">
+<div class="app hidden" id="app">
 
   <!-- ═══════ HOME ═══════ -->
   <section class="screen active" id="screen-home">
     <header class="topbar">
       <div class="topbar-user">
-        <div class="avatar glass" id="avatar">U</div>
+        <div class="avatar glass" id="avatar"></div>
         <div>
           <div class="hello">Добро пожаловать</div>
           <div class="username" id="user-name">Гость</div>
         </div>
       </div>
-      <button class="icon-btn glass" id="btn-admin-gear" style="display:none">⚙️</button>
+      <button class="icon-btn glass" id="btn-admin-gear" style="display:none">
+        <img src="" alt="settings" id="admin-gear-icon">
+      </button>
     </header>
 
     <div class="hero-banner glass">
@@ -461,7 +730,7 @@ html, body {
     </header>
     <div class="order-list" id="order-list"></div>
     <div class="empty-state glass" id="orders-empty" style="display:none">
-      <div class="empty-emoji">🧾</div>
+      <div style="font-size:30px;">📋</div>
       <div>Заказов пока нет</div>
     </div>
   </section>
@@ -473,7 +742,7 @@ html, body {
     </header>
 
     <div class="profile-card glass">
-      <div class="avatar-lg glass" id="avatar-lg">U</div>
+      <div class="avatar-lg glass" id="avatar-lg"></div>
       <div class="profile-name" id="profile-name">—</div>
       <div class="profile-id" id="profile-id">ID: —</div>
     </div>
@@ -481,13 +750,13 @@ html, body {
     <div class="section-head"><h3>Информация</h3></div>
     <div class="menu-list">
       <div class="menu-item glass" data-goto="orders">
-        <span class="menu-ic glass">🧾</span> Мои заказы <span class="chev">›</span>
+        <span class="menu-ic"><img src="" alt="orders" id="menu-orders-icon"></span> Мои заказы <span class="chev">›</span>
       </div>
       <div class="menu-item glass" id="menu-support">
-        <span class="menu-ic glass">💬</span> Поддержка <span class="chev">›</span>
+        <span class="menu-ic"><img src="" alt="support" id="menu-support-icon"></span> Поддержка <span class="chev">›</span>
       </div>
       <div class="menu-item glass" id="menu-admin" style="display:none">
-        <span class="menu-ic glass">⚙️</span> Админ-панель <span class="chev">›</span>
+        <span class="menu-ic"><img src="" alt="admin" id="menu-admin-icon"></span> Админ-панель <span class="chev">›</span>
       </div>
     </div>
   </section>
@@ -498,23 +767,23 @@ html, body {
       <h2 class="page-title">Админ-панель</h2>
     </header>
 
-    <div class="segmented glass" id="admin-tabs" style="display:flex;gap:4px;padding:4px;border-radius:18px;margin-bottom:20px;">
-      <button class="segmented-item active" data-admin-tab="stats" style="flex:1;padding:10px 0;background:none;border:none;color:var(--text-dim);font-weight:700;cursor:pointer;border-radius:14px;transition:all 0.2s;">Статистика</button>
-      <button class="segmented-item" data-admin-tab="products" style="flex:1;padding:10px 0;background:none;border:none;color:var(--text-dim);font-weight:700;cursor:pointer;border-radius:14px;transition:all 0.2s;">Товары</button>
-      <button class="segmented-item" data-admin-tab="orders" style="flex:1;padding:10px 0;background:none;border:none;color:var(--text-dim);font-weight:700;cursor:pointer;border-radius:14px;transition:all 0.2s;">Заказы</button>
+    <div class="admin-tabs glass" id="admin-tabs">
+      <button class="admin-tab active" data-admin-tab="stats">Статистика</button>
+      <button class="admin-tab" data-admin-tab="products">Товары</button>
+      <button class="admin-tab" data-admin-tab="orders">Заказы</button>
     </div>
 
     <div class="admin-panel active" id="admin-stats">
-      <div class="stats-grid" id="stats-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"></div>
+      <div class="stats-grid" id="stats-grid"></div>
     </div>
 
-    <div class="admin-panel" id="admin-products" style="display:none;">
-      <button class="btn-primary" id="btn-new-product" style="width:100%;background:var(--accent-grad);border:none;color:#fff;padding:15px;border-radius:20px;font-size:14.5px;font-weight:700;cursor:pointer;margin-bottom:18px;">+ Добавить товар</button>
-      <div class="admin-list" id="admin-product-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <div class="admin-panel" id="admin-products">
+      <button class="btn-primary" id="btn-new-product">+ Добавить товар</button>
+      <div class="admin-list" id="admin-product-list"></div>
     </div>
 
-    <div class="admin-panel" id="admin-orders" style="display:none;">
-      <div class="admin-list" id="admin-order-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <div class="admin-panel" id="admin-orders">
+      <div class="admin-list" id="admin-order-list"></div>
     </div>
   </section>
 
@@ -522,44 +791,30 @@ html, body {
   <nav class="bottom-nav glass" id="bottom-nav">
     <div class="nav-indicator glass-indicator" id="nav-indicator"></div>
     <button class="nav-item active" data-target="home">
-      <svg class="nav-ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 11.5L12 4l8 7.5"/>
-        <path d="M6 10v9a1 1 0 001 1h3v-6h4v6h3a1 1 0 001-1v-9"/>
-      </svg>
+      <img src="" alt="home" class="nav-ic" id="nav-home-icon">
       <span>Home</span>
     </button>
     <button class="nav-item" data-target="catalog">
-      <svg class="nav-ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="8" height="8" rx="2"/>
-        <rect x="13" y="3" width="8" height="8" rx="2"/>
-        <rect x="3" y="13" width="8" height="8" rx="2"/>
-        <rect x="13" y="13" width="8" height="8" rx="2"/>
-      </svg>
+      <img src="" alt="catalog" class="nav-ic" id="nav-catalog-icon">
       <span>Catalog</span>
     </button>
     <button class="nav-item" data-target="orders">
-      <svg class="nav-ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 2h9l3 3v17H6V2z"/>
-        <path d="M9 9h6M9 13h6M9 17h3"/>
-      </svg>
+      <img src="" alt="orders" class="nav-ic" id="nav-orders-icon">
       <span>Orders</span>
     </button>
     <button class="nav-item" data-target="profile">
-      <svg class="nav-ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="8" r="3.6"/>
-        <path d="M4.5 20c1.4-3.7 4.3-5.5 7.5-5.5s6.1 1.8 7.5 5.5"/>
-      </svg>
+      <img src="" alt="profile" class="nav-ic" id="nav-profile-icon">
       <span>Profile</span>
     </button>
   </nav>
 
 </div>
 
-<!-- ═══════ PRODUCT SHEET (модалка товара) ═══════ -->
+<!-- ═══════ PRODUCT SHEET ═══════ -->
 <div class="sheet-overlay" id="sheet-overlay">
   <div class="sheet glass" id="product-sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-emoji" id="sheet-emoji">🎁</div>
+    <div class="sheet-icon-wrapper"><img src="" alt="product" id="sheet-icon"></div>
     <div class="sheet-title" id="sheet-title">Название товара</div>
     <div class="sheet-desc" id="sheet-desc">Описание</div>
     <div class="sheet-price-row">
@@ -579,53 +834,128 @@ html, body {
       <div class="pay-status-title" id="pay-status-title">Ожидание оплаты…</div>
       <div class="pay-status-sub" id="pay-status-sub">Имитация оплаты через 3 секунды</div>
       <div class="delivered-box" id="delivered-box" style="display:none"></div>
-      <button class="btn-primary glass-active" id="pay-close" style="display:none;width:100%;background:var(--accent-grad);border:none;color:#fff;padding:15px;border-radius:18px;font-size:14.5px;font-weight:700;cursor:pointer;">Закрыть</button>
+      <button class="btn-close" id="pay-close" style="display:none;">Закрыть</button>
     </div>
   </div>
 </div>
 
 <script>
 // ═══════════════════════════════════════════════════
-// ПОЛНОСТЬЮ ФРОНТЕНД ВЕРСИЯ — БЕЗ БЭКЕНДА
+// ICONS.JS — генерация SVG иконок
 // ═══════════════════════════════════════════════════
 
-// ─── TELEGRAM WEBAPP ───
-// ─── TELEGRAM WEBAPP (без проверки) ───
-const tg = window.Telegram?.WebApp || {
-  ready: () => {},
-  expand: () => {},
-  setHeaderColor: () => {},
-  setBackgroundColor: () => {},
-  HapticFeedback: { impactOccurred: () => {}, notificationOccurred: () => {} },
-  showAlert: (msg) => alert(msg),
-  openTelegramLink: (url) => window.open(url, '_blank'),
-};
-window.tg = tg;
+const ICON_API = 'https://api.iconify.design';
+const ICON_DEFAULT_SET = 'lucide';
 
-// ─── ДАННЫЕ ───
+function iconUrl(name, color) {
+  let set = ICON_DEFAULT_SET;
+  let n = String(name || 'package').trim() || 'package';
+  if (n.includes(':')) [set, n] = n.split(':');
+  return `${ICON_API}/${encodeURIComponent(set)}/${encodeURIComponent(n)}.svg?color=${encodeURIComponent(color)}`;
+}
+
+function ic(name, size = 20, color = '#f5f5f5', cls = '') {
+  const fallback = iconUrl('package', color);
+  return `<img class="ic ${cls}" src="${iconUrl(name, color)}" width="${size}" height="${size}" alt=""
+    loading="lazy" draggable="false" onerror="this.onerror=null;this.src='${fallback}'">`;
+}
+
+function setIcon(element, name, size = 20, color = '#f5f5f5') {
+  if (!element) return;
+  element.src = iconUrl(name, color);
+  element.width = size;
+  element.height = size;
+}
+
+// ═══════════════════════════════════════════════════
+// ПРОВЕРКА TELEGRAM + ИКОНКИ ДЛЯ БЛОКИРОВКИ
+// ═══════════════════════════════════════════════════
+
+// Устанавливаем иконки для блокировки
+function setupBlockedIcons() {
+    setIcon(document.getElementById('blocked-icon'), 'send', 44, '#34E7C4');
+    setIcon(document.getElementById('feature-shield'), 'shield-check', 18, '#34E7C4');
+    setIcon(document.getElementById('feature-bolt'), 'zap', 18, '#8B6CFF');
+    setIcon(document.getElementById('feature-users'), 'users', 18, '#34E7C4');
+    setIcon(document.getElementById('btn-send-icon'), 'send', 20, '#f5f5f5');
+    setIcon(document.getElementById('btn-users-icon'), 'users', 20, '#8f8f8f');
+}
+
+// Проверка Telegram
+function checkTelegram() {
+    const tg = window.Telegram?.WebApp;
+    const hasValidInitData = tg && typeof tg.initData === "string" && tg.initData.length > 20;
+    
+    if (!hasValidInitData) {
+        // Показываем блокировку
+        document.getElementById('blocked-screen').classList.remove('hidden');
+        document.querySelector('.app').classList.add('hidden');
+        document.querySelector('.bg-blobs').style.display = 'none';
+        setupBlockedIcons();
+        return false;
+    }
+    
+    // Всё ок, скрываем блокировку
+    document.getElementById('blocked-screen').classList.add('hidden');
+    document.querySelector('.app').classList.remove('hidden');
+    
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor && tg.setHeaderColor("#000000");
+    tg.setBackgroundColor && tg.setBackgroundColor("#000000");
+    window.tg = tg;
+    return true;
+}
+
+// Запускаем проверку
+const isTelegram = checkTelegram();
+// Получаем данные пользователя из Telegram
+function getTelegramUser() {
+  try {
+    const user = tg.initDataUnsafe?.user;
+    if (user) {
+      return {
+        id: user.id,
+        username: user.username || 'user',
+        first_name: user.first_name || 'Пользователь',
+        last_name: user.last_name || '',
+        photo_url: user.photo_url || null,
+        is_admin: true, // Для демо
+      };
+    }
+  } catch (e) {
+    console.log('Telegram user data not available');
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════
+// ДАННЫЕ
+// ═══════════════════════════════════════════════════
+
 const STORE_DATA = {
   categories: [
-    { id: 1, title: "Подписки", icon: "📺", sort_order: 1 },
-    { id: 2, title: "Игровые ключи", icon: "🎮", sort_order: 2 },
-    { id: 3, title: "Софт", icon: "💻", sort_order: 3 },
-    { id: 4, title: "Аккаунты", icon: "👤", sort_order: 4 },
-    { id: 5, title: "Крипто-товары", icon: "₿", sort_order: 5 },
+    { id: 1, title: "Подписки", icon: "clapperboard", sort_order: 1 },
+    { id: 2, title: "Игровые ключи", icon: "gamepad-2", sort_order: 2 },
+    { id: 3, title: "Софт", icon: "monitor", sort_order: 3 },
+    { id: 4, title: "Аккаунты", icon: "users", sort_order: 4 },
+    { id: 5, title: "Крипто-товары", icon: "bitcoin", sort_order: 5 },
   ],
   products: [
-    { id: 1, category_id: 1, title: "Netflix Premium 1 месяц", description: "Доступ к аккаунту 4K UHD. До 5 устройств одновременно.", price: 4.5, asset: "USDT", type: "subscription", duration_days: 30, icon: "📺", stock: null },
-    { id: 2, category_id: 1, title: "Spotify Premium 3 месяца", description: "Музыка без рекламы, офлайн-режим, высокое качество.", price: 7.99, asset: "USDT", type: "subscription", duration_days: 90, icon: "🎵", stock: null },
-    { id: 3, category_id: 1, title: "YouTube Premium 6 месяцев", description: "Видео без рекламы, фоновый режим, YouTube Music.", price: 12.99, asset: "USDT", type: "subscription", duration_days: 180, icon: "▶️", stock: null },
-    { id: 4, category_id: 2, title: "Steam Gift Card $10", description: "Ключ активации Steam для пополнения баланса.", price: 11, asset: "USDT", type: "key", icon: "🎮", stock: 5 },
-    { id: 5, category_id: 2, title: "Xbox Game Pass Ultimate 1 месяц", description: "Доступ к сотням игр на Xbox и PC.", price: 14.99, asset: "USDT", type: "key", icon: "🎮", stock: 3 },
-    { id: 6, category_id: 2, title: "PlayStation Plus 3 месяца", description: "Игры каждый месяц, онлайн-мультиплеер, скидки.", price: 19.99, asset: "USDT", type: "key", icon: "🎮", stock: 2 },
-    { id: 7, category_id: 3, title: "Windows 11 Pro Key", description: "Лицензионный ключ для Windows 11 Pro.", price: 15, asset: "USDT", type: "key", icon: "💻", stock: 4 },
-    { id: 8, category_id: 3, title: "Adobe Creative Cloud 1 месяц", description: "Photoshop, Premiere, After Effects и все приложения Adobe.", price: 39.99, asset: "USDT", type: "subscription", duration_days: 30, icon: "🎨", stock: null },
-    { id: 9, category_id: 3, title: "Microsoft Office 2021", description: "Word, Excel, PowerPoint, Outlook — постоянная лицензия.", price: 29.99, asset: "USDT", type: "key", icon: "📄", stock: 5 },
-    { id: 10, category_id: 4, title: "ChatGPT Plus аккаунт", description: "Доступ к GPT-4, быстрые ответы, приоритетное обслуживание.", price: 12.99, asset: "USDT", type: "key", icon: "🤖", stock: 3 },
-    { id: 11, category_id: 4, title: "Instagram аккаунт 1000 подписчиков", description: "Готовый аккаунт с реальными подписчиками.", price: 25.99, asset: "USDT", type: "key", icon: "📱", stock: 2 },
-    { id: 12, category_id: 5, title: "Крипто-кошелёк Trust Wallet", description: "Готовый кошелёк с seed-фразой. Мультивалютный.", price: 5.99, asset: "USDT", type: "key", icon: "💰", stock: 5 },
-    { id: 13, category_id: 5, title: "VPN Премиум 1 год", description: "Безопасный доступ к интернету, обход блокировок.", price: 49.99, asset: "USDT", type: "subscription", duration_days: 365, icon: "🔒", stock: null },
-    { id: 14, category_id: 5, title: "NFT коллекция 'CyberPunk'", description: "Уникальный NFT-токен. Ограниченный выпуск.", price: 99.99, asset: "USDT", type: "key", icon: "🖼️", stock: 1 },
+    { id: 1, category_id: 1, title: "Netflix Premium 1 месяц", description: "Доступ к аккаунту 4K UHD. До 5 устройств одновременно.", price: 4.5, asset: "USDT", type: "subscription", duration_days: 30, icon: "tv" },
+    { id: 2, category_id: 1, title: "Spotify Premium 3 месяца", description: "Музыка без рекламы, офлайн-режим, высокое качество.", price: 7.99, asset: "USDT", type: "subscription", duration_days: 90, icon: "music" },
+    { id: 3, category_id: 1, title: "YouTube Premium 6 месяцев", description: "Видео без рекламы, фоновый режим, YouTube Music.", price: 12.99, asset: "USDT", type: "subscription", duration_days: 180, icon: "youtube" },
+    { id: 4, category_id: 2, title: "Steam Gift Card $10", description: "Ключ активации Steam для пополнения баланса.", price: 11, asset: "USDT", type: "key", icon: "gamepad-2" },
+    { id: 5, category_id: 2, title: "Xbox Game Pass Ultimate 1 месяц", description: "Доступ к сотням игр на Xbox и PC.", price: 14.99, asset: "USDT", type: "key", icon: "controller" },
+    { id: 6, category_id: 2, title: "PlayStation Plus 3 месяца", description: "Игры каждый месяц, онлайн-мультиплеер, скидки.", price: 19.99, asset: "USDT", type: "key", icon: "play" },
+    { id: 7, category_id: 3, title: "Windows 11 Pro Key", description: "Лицензионный ключ для Windows 11 Pro.", price: 15, asset: "USDT", type: "key", icon: "monitor" },
+    { id: 8, category_id: 3, title: "Adobe Creative Cloud 1 месяц", description: "Photoshop, Premiere, After Effects и все приложения Adobe.", price: 39.99, asset: "USDT", type: "subscription", duration_days: 30, icon: "palette" },
+    { id: 9, category_id: 3, title: "Microsoft Office 2021", description: "Word, Excel, PowerPoint, Outlook — постоянная лицензия.", price: 29.99, asset: "USDT", type: "key", icon: "file-text" },
+    { id: 10, category_id: 4, title: "ChatGPT Plus аккаунт", description: "Доступ к GPT-4, быстрые ответы, приоритетное обслуживание.", price: 12.99, asset: "USDT", type: "key", icon: "bot" },
+    { id: 11, category_id: 4, title: "Instagram аккаунт 1000 подписчиков", description: "Готовый аккаунт с реальными подписчиками.", price: 25.99, asset: "USDT", type: "key", icon: "instagram" },
+    { id: 12, category_id: 5, title: "Крипто-кошелёк Trust Wallet", description: "Готовый кошелёк с seed-фразой. Мультивалютный.", price: 5.99, asset: "USDT", type: "key", icon: "wallet" },
+    { id: 13, category_id: 5, title: "VPN Премиум 1 год", description: "Безопасный доступ к интернету, обход блокировок.", price: 49.99, asset: "USDT", type: "subscription", duration_days: 365, icon: "shield" },
+    { id: 14, category_id: 5, title: "NFT коллекция 'CyberPunk'", description: "Уникальный NFT-токен. Ограниченный выпуск.", price: 99.99, asset: "USDT", type: "key", icon: "image" },
   ],
   keys: {
     4: ["STEAM-XXXX-YYYY-ZZZZ", "STEAM-AAAA-BBBB-CCCC", "STEAM-1111-2222-3333", "STEAM-4444-5555-6666", "STEAM-7777-8888-9999"],
@@ -643,20 +973,30 @@ const STORE_DATA = {
   nextOrderId: 1,
 };
 
-// ─── СОСТОЯНИЕ ───
-let CURRENT_USER = { 
-  id: 1, 
-  tg_id: 123456789, 
-  username: "user", 
-  first_name: "Пользователь", 
-  is_admin: true 
+// ═══════════════════════════════════════════════════
+// СОСТОЯНИЕ
+// ═══════════════════════════════════════════════════
+
+const tgUser = getTelegramUser();
+const CURRENT_USER = {
+  id: tgUser?.id || 123456789,
+  tg_id: tgUser?.id || 123456789,
+  username: tgUser?.username || 'user',
+  first_name: tgUser?.first_name || 'Пользователь',
+  last_name: tgUser?.last_name || '',
+  photo_url: tgUser?.photo_url || null,
+  is_admin: true,
 };
+
 let SELECTED_CATEGORY = null;
 let SELECTED_PRODUCT = null;
 let currentScreen = 'home';
 let pollTimer = null;
 
-// ─── УТИЛИТЫ ───
+// ═══════════════════════════════════════════════════
+// УТИЛИТЫ
+// ═══════════════════════════════════════════════════
+
 function getCategory(id) {
   return STORE_DATA.categories.find(c => c.id === id);
 }
@@ -689,7 +1029,10 @@ function getAvailableKey(productId) {
   return available[0] || null;
 }
 
-// ─── НАВИГАЦИЯ ───
+// ═══════════════════════════════════════════════════
+// НАВИГАЦИЯ
+// ═══════════════════════════════════════════════════
+
 const navItems = document.querySelectorAll(".nav-item");
 const screens = document.querySelectorAll(".screen");
 const navIndicator = document.getElementById("nav-indicator");
@@ -735,35 +1078,55 @@ document.querySelectorAll("[data-goto]").forEach(el =>
   el.addEventListener("click", () => goTo(el.dataset.goto))
 );
 
-// ─── ИНИЦИАЛИЗАЦИЯ ───
-function init() {
-  renderUser();
-  renderCategories();
-  loadFeatured();
-  loadCatalog();
+// ═══════════════════════════════════════════════════
+// УСТАНОВКА ИКОНОК
+// ═══════════════════════════════════════════════════
+
+function setupIcons() {
+  // Навигация
+  setIcon(document.getElementById('nav-home-icon'), 'home', 22, '#8f8f8f');
+  setIcon(document.getElementById('nav-catalog-icon'), 'grid', 22, '#8f8f8f');
+  setIcon(document.getElementById('nav-orders-icon'), 'file-text', 22, '#8f8f8f');
+  setIcon(document.getElementById('nav-profile-icon'), 'user', 22, '#8f8f8f');
   
-  // Настройка навигации
-  setTimeout(() => {
-    moveNavIndicator(document.querySelector(".nav-item.active"));
-  }, 100);
+  // Админ
+  setIcon(document.getElementById('admin-gear-icon'), 'settings', 20, '#f5f5f5');
+  
+  // Меню профиля
+  setIcon(document.getElementById('menu-orders-icon'), 'file-text', 20, '#f5f5f5');
+  setIcon(document.getElementById('menu-support-icon'), 'message-circle', 20, '#f5f5f5');
+  setIcon(document.getElementById('menu-admin-icon'), 'settings', 20, '#f5f5f5');
+
+  setIcon(document.getElementById('blocked-icon'), 'send', 44, '#34E7C4');
+  setIcon(document.getElementById('feature-shield'), 'shield-check', 18, '#34E7C4');
+  setIcon(document.getElementById('feature-bolt'), 'zap', 18, '#8B6CFF');
+  setIcon(document.getElementById('feature-users'), 'users', 18, '#34E7C4');
+  setIcon(document.getElementById('btn-send-icon'), 'send', 20, '#f5f5f5');
+  setIcon(document.getElementById('btn-users-icon'), 'users', 20, '#8f8f8f');
 }
 
-function moveNavIndicator(btn) {
-  if (!btn) return;
-  const items = [...navItems];
-  const index = items.indexOf(btn);
-  navIndicator.style.width = `calc((100% - 16px) / ${items.length})`;
-  navIndicator.style.transform = `translateX(${index * 100}%)`;
-}
+// ═══════════════════════════════════════════════════
+// ПОЛЬЗОВАТЕЛЬ
+// ═══════════════════════════════════════════════════
 
 function renderUser() {
   const name = CURRENT_USER.first_name || CURRENT_USER.username || "Гость";
   document.getElementById("user-name").textContent = name;
   document.getElementById("profile-name").textContent = name;
   document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
-  const initial = name[0]?.toUpperCase() || "U";
-  document.getElementById("avatar").textContent = initial;
-  document.getElementById("avatar-lg").textContent = initial;
+  
+  // Аватарка из Telegram
+  const avatarEl = document.getElementById('avatar');
+  const avatarLg = document.getElementById('avatar-lg');
+  
+  if (CURRENT_USER.photo_url) {
+    avatarEl.innerHTML = `<img src="${CURRENT_USER.photo_url}" alt="avatar">`;
+    avatarLg.innerHTML = `<img src="${CURRENT_USER.photo_url}" alt="avatar">`;
+  } else {
+    const initial = name[0]?.toUpperCase() || "U";
+    avatarEl.textContent = initial;
+    avatarLg.textContent = initial;
+  }
 
   if (CURRENT_USER.is_admin) {
     document.getElementById("btn-admin-gear").style.display = "flex";
@@ -771,13 +1134,18 @@ function renderUser() {
   }
 }
 
-// ─── КАТЕГОРИИ ───
+// ═══════════════════════════════════════════════════
+// КАТЕГОРИИ
+// ═══════════════════════════════════════════════════
+
 function renderCategories() {
   const html = (activeId) => `
-    <button class="cat-pill glass ${activeId === null ? "active" : ""}" data-cat="">Все</button>
+    <button class="cat-pill glass ${activeId === null ? "active" : ""}" data-cat="">
+      ${ic('layout-grid', 18, '#8f8f8f')} Все
+    </button>
     ${STORE_DATA.categories.map(c => `
       <button class="cat-pill glass ${activeId === c.id ? "active" : ""}" data-cat="${c.id}">
-        ${c.icon} ${c.title}
+        ${ic(c.icon, 18, '#8f8f8f')} ${c.title}
       </button>
     `).join("")}
   `;
@@ -794,7 +1162,10 @@ function renderCategories() {
   });
 }
 
-// ─── ТОВАРЫ ───
+// ═══════════════════════════════════════════════════
+// ТОВАРЫ
+// ═══════════════════════════════════════════════════
+
 function productCardHTML(p) {
   const stock = p.type === "key" ? getStock(p.id) : null;
   const stockBadge = p.type === "key"
@@ -803,7 +1174,7 @@ function productCardHTML(p) {
   
   return `
     <div class="product-card glass" data-id="${p.id}">
-      <div class="product-icon-wrapper">${p.icon || '📦'}</div>
+      <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
       <div class="product-title">${p.title}</div>
       ${stockBadge}
       <div class="product-price">${p.price} <span>${p.asset}</span></div>
@@ -820,7 +1191,7 @@ function loadFeatured() {
 function loadCatalog() {
   const products = getProducts(SELECTED_CATEGORY);
   document.getElementById("catalog-products").innerHTML = products.map(productCardHTML).join("") ||
-    `<div class="empty-state glass" style="grid-column:1/-1"><div class="empty-emoji">📭</div>Товаров нет</div>`;
+    `<div class="empty-state glass" style="grid-column:1/-1"><div style="font-size:30px;">📭</div>Товаров нет</div>`;
   bindProductCards();
 }
 
@@ -834,17 +1205,25 @@ function bindProductCards() {
   });
 }
 
-// ─── МОДАЛКА ТОВАРА ───
+// ═══════════════════════════════════════════════════
+// МОДАЛКА ТОВАРА
+// ═══════════════════════════════════════════════════
+
 const sheetOverlay = document.getElementById("sheet-overlay");
 
 function openProductSheet(p) {
   const stock = p.type === "key" ? getStock(p.id) : null;
-  document.getElementById("sheet-emoji").textContent = p.icon || '📦';
+  
+  // Иконка
+  const iconEl = document.getElementById('sheet-icon');
+  setIcon(iconEl, p.icon || 'package', 40, '#f5f5f5');
+  
   document.getElementById("sheet-title").textContent = p.title;
   document.getElementById("sheet-desc").textContent = p.description || "Описание товара";
   document.getElementById("sheet-price").textContent = `${p.price} ${p.asset}`;
   document.getElementById("sheet-stock").textContent =
     p.type === "key" ? (stock > 0 ? `В наличии: ${stock}` : "Нет в наличии") : `Длительность: ${p.duration_days || 30} дн`;
+  
   const buyBtn = document.getElementById("btn-buy");
   buyBtn.disabled = p.type === "key" && stock === 0;
   buyBtn.textContent = buyBtn.disabled ? "Нет в наличии" : "Купить через CryptoBot";
@@ -873,7 +1252,6 @@ document.getElementById("btn-buy").addEventListener("click", () => {
     return;
   }
   
-  // Создаём заказ
   const order = {
     id: STORE_DATA.nextOrderId++,
     product_id: p.id,
@@ -889,13 +1267,15 @@ document.getElementById("btn-buy").addEventListener("click", () => {
   sheetOverlay.classList.remove("open");
   openPaySheet(order);
   
-  // Имитация оплаты через 3 секунды
   setTimeout(() => {
     finishPayment(order.id);
   }, 3000);
 });
 
-// ─── ОПЛАТА ───
+// ═══════════════════════════════════════════════════
+// ОПЛАТА
+// ═══════════════════════════════════════════════════
+
 const payOverlay = document.getElementById("pay-overlay");
 
 function openPaySheet() {
@@ -938,7 +1318,6 @@ function finishPayment(orderId) {
   order.delivered_content = delivered;
   order.paid_at = new Date().toISOString();
   
-  // Показываем результат
   document.getElementById("pay-spinner").style.display = "none";
   document.getElementById("pay-close").style.display = "block";
   document.getElementById("pay-status-title").textContent = "✅ Оплачено!";
@@ -958,14 +1337,17 @@ function finishPayment(orderId) {
   loadCatalog();
 }
 
-// ─── ЗАКАЗЫ ───
+// ═══════════════════════════════════════════════════
+// ЗАКАЗЫ
+// ═══════════════════════════════════════════════════
+
 function loadOrders() {
   const list = document.getElementById("order-list");
   const empty = document.getElementById("orders-empty");
   
   if (!STORE_DATA.orders.length) {
     list.innerHTML = "";
-    empty.style.display = "flex";
+    empty.style.display = "block";
     return;
   }
   
@@ -991,33 +1373,26 @@ function loadOrders() {
   }).join("");
 }
 
-// ─── АДМИНКА ───
+// ═══════════════════════════════════════════════════
+// АДМИНКА
+// ═══════════════════════════════════════════════════
+
 document.getElementById("btn-admin-gear").addEventListener("click", () => goTo("admin"));
 document.getElementById("menu-admin").addEventListener("click", () => goTo("admin"));
 
-// Вкладки админки
-const adminTabs = document.querySelectorAll("#admin-tabs .segmented-item");
+const adminTabs = document.querySelectorAll(".admin-tab");
 adminTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
-    adminTabs.forEach(t => {
-      t.classList.remove("active");
-      t.style.background = "transparent";
-      t.style.color = "var(--text-dim)";
-    });
+    adminTabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
-    tab.style.background = "rgba(255,255,255,0.09)";
-    tab.style.color = "#fff";
     
-    document.querySelectorAll(".admin-panel").forEach(p => p.style.display = "none");
-    document.getElementById(`admin-${tab.dataset.adminTab}`).style.display = "block";
+    document.querySelectorAll(".admin-panel").forEach(p => p.classList.remove("active"));
+    document.getElementById(`admin-${tab.dataset.adminTab}`).classList.add("active");
     
     if (tab.dataset.adminTab === "products") loadAdminProducts();
     if (tab.dataset.adminTab === "orders") loadAdminOrders();
   });
 });
-
-// Активируем первую вкладку
-adminTabs[0].click();
 
 function loadAdminStats() {
   const totalOrders = STORE_DATA.orders.length;
@@ -1029,7 +1404,7 @@ function loadAdminStats() {
     <div class="stat-card glass"><div class="stat-value">${revenue.toFixed(2)}</div><div class="stat-label">Выручка (USDT)</div></div>
     <div class="stat-card glass"><div class="stat-value">${paidOrders.length}</div><div class="stat-label">Оплачено заказов</div></div>
     <div class="stat-card glass"><div class="stat-value">${totalOrders}</div><div class="stat-label">Всего заказов</div></div>
-    <div class="stat-card glass"><div class="stat-value">1</div><div class="stat-label">Пользователей</div></div>
+    <div class="stat-card glass"><div class="stat-value">${totalProducts}</div><div class="stat-label">Товаров</div></div>
   `;
 }
 
@@ -1038,13 +1413,13 @@ function loadAdminProducts() {
   document.getElementById("admin-product-list").innerHTML = products.map(p => {
     const stock = p.type === "key" ? getStock(p.id) : "∞";
     return `
-      <div class="admin-row glass" style="display:flex;align-items:center;gap:12px;border-radius:20px;padding:12px 14px;">
-        <span class="admin-row-emoji" style="font-size:22px;">${p.icon || '📦'}</span>
-        <div class="admin-row-info" style="flex:1;">
-          <div class="admin-row-title" style="font-size:14px;font-weight:700;">${p.title}</div>
-          <div class="admin-row-sub" style="font-size:12px;color:var(--text-dim2);margin-top:2px;">${p.price} ${p.asset} · ${p.type === "key" ? `stock: ${stock}` : `${p.duration_days} дн`}</div>
+      <div class="admin-row glass">
+        <div class="admin-row-icon">${ic(p.icon || 'package', 20, '#f5f5f5')}</div>
+        <div class="admin-row-info">
+          <div class="admin-row-title">${p.title}</div>
+          <div class="admin-row-sub">${p.price} ${p.asset} · ${p.type === "key" ? `stock: ${stock}` : `${p.duration_days} дн`}</div>
         </div>
-        <button class="admin-del-btn" data-id="${p.id}" style="width:30px;height:30px;border-radius:10px;background:rgba(255,92,106,0.12);border:1px solid rgba(255,92,106,0.25);color:var(--danger);font-weight:700;cursor:pointer;">✕</button>
+        <button class="admin-del-btn" data-id="${p.id}">${ic('x', 16, '#8f8f8f')}</button>
       </div>
     `;
   }).join("");
@@ -1067,7 +1442,7 @@ document.getElementById("btn-new-product").addEventListener("click", () => {
   if (!title) return;
   const price = parseFloat(prompt("Цена в USDT:") || "0");
   const description = prompt("Описание:") || "";
-  const icon = prompt("Эмодзи иконки (например: 📺, 🎮, 💻):") || "📦";
+  const icon = prompt("Имя иконки (например: tv, music, gamepad-2):") || "package";
   const type = confirm("Это подписка? OK = подписка, Cancel = разовый ключ") ? "subscription" : "key";
   const duration_days = type === "subscription" ? parseInt(prompt("Срок в днях:") || "30") : null;
   
@@ -1081,7 +1456,6 @@ document.getElementById("btn-new-product").addEventListener("click", () => {
     type,
     duration_days,
     icon,
-    stock: type === "key" ? 0 : null,
     is_active: true,
   };
   
@@ -1089,7 +1463,11 @@ document.getElementById("btn-new-product").addEventListener("click", () => {
   loadAdminProducts();
   loadFeatured();
   loadCatalog();
-  alert("✅ Товар создан!");
+  if (window.tg?.showAlert) {
+    window.tg.showAlert("✅ Товар создан!");
+  } else {
+    alert("✅ Товар создан!");
+  }
 });
 
 function loadAdminOrders() {
@@ -1101,18 +1479,21 @@ function loadAdminOrders() {
       expired: "⌛ Истёк"
     };
     return `
-      <div class="admin-row glass" style="display:flex;align-items:center;gap:12px;border-radius:20px;padding:12px 14px;">
-        <span class="status-dot-admin" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${o.status === 'paid' ? '#34E7C4' : '#FFB454'};"></span>
-        <div class="admin-row-info" style="flex:1;">
-          <div class="admin-row-title" style="font-size:14px;font-weight:700;">Заказ #${o.id}</div>
-          <div class="admin-row-sub" style="font-size:12px;color:var(--text-dim2);margin-top:2px;">${o.amount} ${o.asset} · ${statusLabels[o.status] || o.status}</div>
+      <div class="admin-row glass">
+        <span class="status-dot ${o.status}"></span>
+        <div class="admin-row-info">
+          <div class="admin-row-title">Заказ #${o.id}</div>
+          <div class="admin-row-sub">${o.amount} ${o.asset} · ${statusLabels[o.status] || o.status}</div>
         </div>
       </div>
     `;
   }).join("");
 }
 
-// ─── ПОДДЕРЖКА ───
+// ═══════════════════════════════════════════════════
+// ПОДДЕРЖКА
+// ═══════════════════════════════════════════════════
+
 document.getElementById("menu-support").addEventListener("click", () => {
   if (window.tg?.openTelegramLink) {
     window.tg.openTelegramLink("https://t.me/your_bot_username");
@@ -1121,8 +1502,29 @@ document.getElementById("menu-support").addEventListener("click", () => {
   }
 });
 
-// ─── ЗАПУСК ───
-document.addEventListener('DOMContentLoaded', init);
+// ═══════════════════════════════════════════════════
+// ЗАПУСК
+// ═══════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupIcons();
+  renderUser();
+  renderCategories();
+  loadFeatured();
+  loadCatalog();
+  
+  setTimeout(() => {
+    moveNavIndicator(document.querySelector(".nav-item.active"));
+  }, 100);
+});
+
+function moveNavIndicator(btn) {
+  if (!btn) return;
+  const items = [...navItems];
+  const index = items.indexOf(btn);
+  navIndicator.style.width = `calc((100% - 16px) / ${items.length})`;
+  navIndicator.style.transform = `translateX(${index * 100}%)`;
+}
 </script>
 </body>
 </html>
