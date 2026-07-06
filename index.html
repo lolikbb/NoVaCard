@@ -144,7 +144,12 @@ html, body {
     overflow: hidden;
     flex-shrink: 0;
 }
-.avatar img, .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
+.avatar img, .avatar-lg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 .avatar { width: 46px; height: 46px; font-size: 17px; }
 .avatar-lg { width: 76px; height: 76px; font-size: 28px; margin: 0 auto 14px; }
 .hello { font-size: 12.5px; color: var(--text-dim); }
@@ -199,17 +204,24 @@ html, body {
 }
 .section-head .link:active { color: var(--accent-2); }
 
+/* ═══ СКРОЛЛ КАТЕГОРИЙ — ИСПРАВЛЕН ═══ */
 .cat-scroll {
     display: flex;
     gap: 10px;
     overflow-x: auto;
-    padding-bottom: 6px;
+    overflow-y: hidden;
+    padding: 4px 2px 10px;
     margin-bottom: 22px;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    cursor: grab;
+    scrollbar-width: none;
 }
 .cat-scroll::-webkit-scrollbar {
     display: none;
+}
+.cat-scroll:active {
+    cursor: grabbing;
 }
 
 .cat-pill {
@@ -230,6 +242,7 @@ html, body {
     -webkit-backdrop-filter: var(--blur);
     border: 1px solid var(--stroke);
     box-shadow: var(--glass-shadow);
+    user-select: none;
 }
 .cat-pill:active { transform: scale(0.94); }
 .cat-pill.active {
@@ -240,17 +253,53 @@ html, body {
 }
 .cat-pill img { width: 18px; height: 18px; }
 
-.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
-.product-card {
+/* ═══ ТОВАРЫ С АНИМАЦИЕЙ ═══ */
+.product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 6px;
+    min-height: 200px;
+}
+
+.product-grid .product-card {
     border-radius: var(--radius-md);
     padding: 18px 14px;
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    opacity: 1;
 }
-.product-card:active { transform: scale(0.95); }
+.product-grid .product-card:active { transform: scale(0.95); }
+
+.product-grid .product-card.removing {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+    pointer-events: none;
+}
+
+.product-grid .product-card.adding {
+    animation: cardFadeIn 0.3s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
+}
+
+@keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.product-grid .product-card:nth-child(1) { animation-delay: 0.02s; }
+.product-grid .product-card:nth-child(2) { animation-delay: 0.05s; }
+.product-grid .product-card:nth-child(3) { animation-delay: 0.08s; }
+.product-grid .product-card:nth-child(4) { animation-delay: 0.11s; }
+.product-grid .product-card:nth-child(5) { animation-delay: 0.14s; }
+.product-grid .product-card:nth-child(6) { animation-delay: 0.17s; }
+.product-grid .product-card:nth-child(7) { animation-delay: 0.20s; }
+.product-grid .product-card:nth-child(8) { animation-delay: 0.23s; }
+
 .product-icon-wrapper {
     display: flex;
     align-items: center;
@@ -664,50 +713,6 @@ html, body {
 }
 
 .app.hidden { display: none; }
-
-/* Анимация для товаров */
-.product-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 6px;
-}
-
-.product-card {
-    border-radius: var(--radius-md);
-    padding: 18px 14px;
-    cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    animation: cardFadeIn 0.4s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
-}
-
-@keyframes cardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px) scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.product-card:nth-child(2) { animation-delay: 0.05s; }
-.product-card:nth-child(3) { animation-delay: 0.1s; }
-.product-card:nth-child(4) { animation-delay: 0.15s; }
-.product-card:nth-child(5) { animation-delay: 0.2s; }
-.product-card:nth-child(6) { animation-delay: 0.25s; }
-.product-card:nth-child(7) { animation-delay: 0.3s; }
-.product-card:nth-child(8) { animation-delay: 0.35s; }
-.product-card:nth-child(9) { animation-delay: 0.4s; }
-.product-card:nth-child(10) { animation-delay: 0.45s; }
-
-.product-card:active { transform: scale(0.95); }
 </style>
 </head>
 <body>
@@ -948,7 +953,6 @@ function setIcon(element, name, size = 20, color = '#f5f5f5') {
 // ПРОВЕРКА TELEGRAM + ИКОНКИ ДЛЯ БЛОКИРОВКИ
 // ═══════════════════════════════════════════════════
 
-// Устанавливаем иконки для блокировки
 function setupBlockedIcons() {
     setIcon(document.getElementById('blocked-icon'), 'send', 44, '#34E7C4');
     setIcon(document.getElementById('feature-shield'), 'shield-check', 18, '#34E7C4');
@@ -958,13 +962,11 @@ function setupBlockedIcons() {
     setIcon(document.getElementById('btn-users-icon'), 'users', 20, '#8f8f8f');
 }
 
-// Проверка Telegram
 function checkTelegram() {
     const tg = window.Telegram?.WebApp;
     const hasValidInitData = tg && typeof tg.initData === "string" && tg.initData.length > 20;
 
     if (!hasValidInitData) {
-        // Показываем блокировку
         document.getElementById('blocked-screen').classList.remove('hidden');
         document.querySelector('.app').classList.add('hidden');
         document.querySelector('.bg-blobs').style.display = 'none';
@@ -972,7 +974,6 @@ function checkTelegram() {
         return false;
     }
 
-    // Всё ок, скрываем блокировку
     document.getElementById('blocked-screen').classList.add('hidden');
     document.querySelector('.app').classList.remove('hidden');
 
@@ -984,9 +985,8 @@ function checkTelegram() {
     return true;
 }
 
-// Запускаем проверку
 const isTelegram = checkTelegram();
-// Получаем данные пользователя из Telegram
+
 function getTelegramUser() {
   try {
     const tg = window.Telegram?.WebApp;
@@ -998,7 +998,7 @@ function getTelegramUser() {
         first_name: user.first_name || 'Пользователь',
         last_name: user.last_name || '',
         photo_url: user.photo_url || null,
-        is_admin: true, // Для демо
+        is_admin: true,
       };
     }
   } catch (e) {
@@ -1161,21 +1161,17 @@ document.querySelectorAll("[data-goto]").forEach(el =>
 // ═══════════════════════════════════════════════════
 
 function setupIcons() {
-    // Навигация
     setIcon(document.getElementById('nav-home-icon'), 'home', 22, '#8f8f8f');
     setIcon(document.getElementById('nav-catalog-icon'), 'grid', 22, '#8f8f8f');
     setIcon(document.getElementById('nav-orders-icon'), 'file-text', 22, '#8f8f8f');
     setIcon(document.getElementById('nav-profile-icon'), 'user', 22, '#8f8f8f');
 
-    // Админ
     setIcon(document.getElementById('admin-gear-icon'), 'settings', 20, '#f5f5f5');
 
-    // Меню профиля
     setIcon(document.getElementById('menu-orders-icon'), 'file-text', 20, '#f5f5f5');
     setIcon(document.getElementById('menu-support-icon'), 'message-circle', 20, '#f5f5f5');
     setIcon(document.getElementById('menu-admin-icon'), 'settings', 20, '#f5f5f5');
 
-    // Блокировка
     setIcon(document.getElementById('blocked-icon'), 'send', 44, '#34E7C4');
     setIcon(document.getElementById('feature-shield'), 'shield-check', 18, '#34E7C4');
     setIcon(document.getElementById('feature-bolt'), 'zap', 18, '#8B6CFF');
@@ -1183,18 +1179,13 @@ function setupIcons() {
     setIcon(document.getElementById('btn-send-icon'), 'send', 20, '#f5f5f5');
     setIcon(document.getElementById('btn-users-icon'), 'users', 20, '#8f8f8f');
 
-    // Пустое состояние заказов
     setIcon(document.getElementById('empty-icon'), 'inbox', 48, '#8f8f8f');
-
-    // Кнопка добавить товар
     setIcon(document.getElementById('btn-add-icon'), 'plus', 20, '#f5f5f5');
-
-    // Иконки для статусов оплаты
     setIcon(document.getElementById('pay-spinner-icon'), 'loader', 44, '#34E7C4');
 }
 
 // ═══════════════════════════════════════════════════
-// ПОЛЬЗОВАТЕЛЬ
+// ПОЛЬЗОВАТЕЛЬ — ИСПРАВЛЕНАЯ ВЕРСИЯ
 // ═══════════════════════════════════════════════════
 
 function renderUser() {
@@ -1203,20 +1194,24 @@ function renderUser() {
     document.getElementById("profile-name").textContent = name;
     document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
 
-    // Получаем элементы аватара
     const avatarEl = document.getElementById('avatar');
     const avatarLg = document.getElementById('avatar-lg');
     const initial = name[0]?.toUpperCase() || "U";
 
-    // Пробуем получить фото из Telegram
+    // Очищаем аватар
+    avatarEl.innerHTML = '';
+    avatarLg.innerHTML = '';
+
     let hasPhoto = false;
+
+    // Пробуем получить фото из Telegram
     try {
         const tg = window.Telegram?.WebApp;
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const user = tg.initDataUnsafe.user;
             if (user.photo_url) {
-                avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-                avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
+                avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
                 hasPhoto = true;
                 console.log('✅ Фото загружено из Telegram');
             }
@@ -1225,29 +1220,15 @@ function renderUser() {
         console.log('❌ Ошибка получения фото:', e);
     }
 
-    // Если нет фото - показываем инициалы
+    // Если нет фото — показываем инициалы
     if (!hasPhoto) {
         console.log('ℹ️ Фото не найдено, показываем инициалы');
         avatarEl.textContent = initial;
-        avatarEl.style.display = 'flex';
-        avatarEl.style.alignItems = 'center';
-        avatarEl.style.justifyContent = 'center';
-        avatarEl.style.background = 'linear-gradient(145deg, rgba(139,108,255,0.35), rgba(52,231,196,0.15))';
-        avatarEl.style.fontSize = '17px';
-        avatarEl.style.fontWeight = '800';
-        avatarEl.style.color = '#fff';
-
         avatarLg.textContent = initial;
-        avatarLg.style.display = 'flex';
-        avatarLg.style.alignItems = 'center';
-        avatarLg.style.justifyContent = 'center';
-        avatarLg.style.background = 'linear-gradient(145deg, rgba(139,108,255,0.35), rgba(52,231,196,0.15))';
-        avatarLg.style.fontSize = '28px';
-        avatarLg.style.fontWeight = '800';
-        avatarLg.style.color = '#fff';
+        // Стили уже заданы в CSS, дополнительно не нужно
     }
 
-    // ⭐ ПОКАЗЫВАЕМ АДМИН-ПАНЕЛЬ (всегда для демо)
+    // Показываем админ-панель
     const showAdmin = true;
     if (showAdmin) {
         const gearBtn = document.getElementById("btn-admin-gear");
@@ -1283,17 +1264,7 @@ function renderCategories() {
             const catId = btn.dataset.cat ? Number(btn.dataset.cat) : null;
             document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            const products = getProducts(catId);
-            const container = document.getElementById("featured-products");
-            // Анимация смены контента
-            container.style.opacity = '0';
-            container.style.transform = 'translateY(8px)';
-            setTimeout(() => {
-                container.innerHTML = products.slice(0, 4).map(productCardHTML).join("");
-                container.style.opacity = '1';
-                container.style.transform = 'translateY(0)';
-                bindProductCards();
-            }, 150);
+            animateProductsUpdate('featured-products', getProducts(catId).slice(0, 4));
         });
     });
 
@@ -1303,41 +1274,40 @@ function renderCategories() {
             SELECTED_CATEGORY = btn.dataset.cat ? Number(btn.dataset.cat) : null;
             document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            loadCatalog();
+            animateProductsUpdate('catalog-products', getProducts(SELECTED_CATEGORY));
         });
     });
 }
 
 // ═══════════════════════════════════════════════════
-// ТОВАРЫ
+// АНИМИРОВАННОЕ ОБНОВЛЕНИЕ ТОВАРОВ
 // ═══════════════════════════════════════════════════
 
-function productCardHTML(p) {
-    const stock = p.type === "key" ? getStock(p.id) : null;
-    const stockBadge = p.type === "key"
-        ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
-        : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
+function animateProductsUpdate(containerId, products) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
-    return `
-        <div class="product-card glass" data-id="${p.id}">
-            <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
-            <div class="product-title">${p.title}</div>
-            ${stockBadge}
-            <div class="product-price">${p.price} <span>${p.asset}</span></div>
-        </div>
-    `;
+    // Получаем текущие карточки
+    const currentCards = container.querySelectorAll('.product-card');
+    if (currentCards.length > 0) {
+        // Анимируем исчезновение
+        currentCards.forEach((card, i) => {
+            setTimeout(() => {
+                card.classList.add('removing');
+            }, i * 30);
+        });
+
+        // После завершения анимации обновляем
+        setTimeout(() => {
+            renderProducts(container, products);
+        }, 150 + currentCards.length * 30);
+    } else {
+        // Если карточек нет — сразу рендерим
+        renderProducts(container, products);
+    }
 }
 
-function loadFeatured() {
-    const products = getProducts(null).slice(0, 4);
-    const container = document.getElementById("featured-products");
-    container.innerHTML = products.map(productCardHTML).join("");
-    bindProductCards();
-}
-
-function loadCatalog() {
-    const products = getProducts(SELECTED_CATEGORY);
-    const container = document.getElementById("catalog-products");
+function renderProducts(container, products) {
     if (products.length === 0) {
         container.innerHTML = `
             <div class="empty-state glass" style="grid-column:1/-1">
@@ -1345,27 +1315,50 @@ function loadCatalog() {
                 <div>Товаров нет</div>
             </div>
         `;
-    } else {
-        // Анимация смены контента
-        container.style.opacity = '0';
-        container.style.transform = 'translateY(8px)';
-        setTimeout(() => {
-            container.innerHTML = products.map(productCardHTML).join("");
-            container.style.opacity = '1';
-            container.style.transform = 'translateY(0)';
-            bindProductCards();
-        }, 150);
+        return;
     }
+
+    container.innerHTML = products.map((p, index) => {
+        const stock = p.type === "key" ? getStock(p.id) : null;
+        const stockBadge = p.type === "key"
+            ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
+            : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
+
+        return `
+            <div class="product-card glass adding" data-id="${p.id}" style="animation-delay: ${index * 0.03}s">
+                <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
+                <div class="product-title">${p.title}</div>
+                ${stockBadge}
+                <div class="product-price">${p.price} <span>${p.asset}</span></div>
+            </div>
+        `;
+    }).join("");
+
+    bindProductCards(container);
 }
 
-function bindProductCards() {
-  document.querySelectorAll(".product-card").forEach(card => {
-    card.addEventListener("click", () => {
-      const id = Number(card.dataset.id);
-      SELECTED_PRODUCT = getProduct(id);
-      if (SELECTED_PRODUCT) openProductSheet(SELECTED_PRODUCT);
+function bindProductCards(container) {
+    container.querySelectorAll(".product-card").forEach(card => {
+        card.addEventListener("click", () => {
+            const id = Number(card.dataset.id);
+            SELECTED_PRODUCT = getProduct(id);
+            if (SELECTED_PRODUCT) openProductSheet(SELECTED_PRODUCT);
+        });
     });
-  });
+}
+
+// ═══════════════════════════════════════════════════
+// ЗАГРУЗКА ТОВАРОВ
+// ═══════════════════════════════════════════════════
+
+function loadFeatured() {
+    const container = document.getElementById("featured-products");
+    renderProducts(container, getProducts(null).slice(0, 4));
+}
+
+function loadCatalog() {
+    const container = document.getElementById("catalog-products");
+    renderProducts(container, getProducts(SELECTED_CATEGORY));
 }
 
 // ═══════════════════════════════════════════════════
@@ -1377,7 +1370,6 @@ const sheetOverlay = document.getElementById("sheet-overlay");
 function openProductSheet(p) {
   const stock = p.type === "key" ? getStock(p.id) : null;
 
-  // Иконка
   const iconEl = document.getElementById('sheet-icon');
   setIcon(iconEl, p.icon || 'package', 40, '#f5f5f5');
 
