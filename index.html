@@ -69,10 +69,10 @@
 .glass-active { box-shadow: var(--glass-shadow-active); }
 .glass-indicator { box-shadow: var(--glass-shadow-indicator); }
 
-* { 
-    box-sizing: border-box; 
-    margin: 0; 
-    padding: 0; 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -120,8 +120,8 @@ html, body {
     min-height: 100vh;
 }
 
-.screen { 
-    display: none; 
+.screen {
+    display: none;
     animation: fadeUp 0.35s cubic-bezier(0.25, 0.9, 0.35, 1);
 }
 .screen.active { display: block; }
@@ -136,9 +136,13 @@ html, body {
 .avatar, .avatar-lg {
     border-radius: 50%;
     background: linear-gradient(145deg, rgba(139,108,255,0.35), rgba(52,231,196,0.15));
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #fff;
     overflow: hidden;
+    flex-shrink: 0;
 }
 .avatar img, .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
 .avatar { width: 46px; height: 46px; font-size: 17px; }
@@ -150,7 +154,9 @@ html, body {
 .icon-btn {
     width: 44px; height: 44px; border-radius: 15px;
     color: var(--text);
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     background: var(--surface);
@@ -184,28 +190,46 @@ html, body {
 
 .section-head { display: flex; align-items: center; justify-content: space-between; margin: 8px 2px 14px; }
 .section-head h3 { font-size: 16.5px; font-weight: 700; }
-.section-head .link { 
-    font-size: 13px; 
-    color: var(--text-dim); 
-    font-weight: 600; 
+.section-head .link {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 600;
     cursor: pointer;
     transition: color 0.2s ease;
 }
 .section-head .link:active { color: var(--accent-2); }
 
-.cat-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 22px; }
+.cat-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 22px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+.cat-scroll::-webkit-scrollbar {
+    display: none;
+}
+
 .cat-pill {
     flex-shrink: 0;
     padding: 10px 18px;
     border-radius: 30px;
     color: var(--text-dim);
-    font-size: 13.5px; font-weight: 600;
+    font-size: 13.5px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     white-space: nowrap;
     display: flex;
     align-items: center;
     gap: 8px;
+    background: var(--surface);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--stroke);
+    box-shadow: var(--glass-shadow);
 }
 .cat-pill:active { transform: scale(0.94); }
 .cat-pill.active {
@@ -247,7 +271,7 @@ html, body {
     border: 1px solid rgba(52,231,196,0.25);
     padding: 3px 9px; border-radius: 20px;
 }
-.stock-badge.out { color: var(--danger); background: rgba(255,92,106,0.1); border-color: rgba(255,92,106,0.25); }
+.stock-badge.out { color: #FF5C6A; background: rgba(255,92,106,0.1); border-color: rgba(255,92,106,0.25); }
 .product-price { font-size: 16px; font-weight: 800; margin-top: 2px; }
 .product-price span { font-size: 11.5px; color: var(--text-dim); font-weight: 600; }
 
@@ -282,9 +306,9 @@ html, body {
 .order-pay-link:active { opacity: 0.6; }
 
 .status-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
-.status-pending { color: var(--warning); background: rgba(255,180,84,0.12); }
+.status-pending { color: #FFB454; background: rgba(255,180,84,0.12); }
 .status-paid { color: var(--accent-2); background: rgba(52,231,196,0.12); }
-.status-failed, .status-expired { color: var(--danger); background: rgba(255,92,106,0.12); }
+.status-failed, .status-expired { color: #FF5C6A; background: rgba(255,92,106,0.12); }
 
 .profile-card { border-radius: var(--radius-lg); padding: 32px 20px; text-align: center; margin-bottom: 24px; }
 .profile-name { font-size: 18px; font-weight: 800; }
@@ -339,10 +363,10 @@ html, body {
 }
 .nav-item.active { color: #fff; }
 .nav-item:active { transform: scale(0.92); }
-.nav-ic { 
+.nav-ic {
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.nav-item.active .nav-ic { 
+.nav-item.active .nav-ic {
     transform: translateY(-2px) scale(1.05);
 }
 .nav-item img { width: 22px; height: 22px; }
@@ -510,7 +534,7 @@ html, body {
     align-items: center;
     justify-content: center;
 }
-.admin-del-btn:active { transform: scale(0.85); color: var(--danger); }
+.admin-del-btn:active { transform: scale(0.85); color: #FF5C6A; }
 .admin-del-btn img { width: 16px; height: 16px; }
 
 .status-dot {
@@ -519,9 +543,9 @@ html, body {
     border-radius: 50%;
     flex-shrink: 0;
 }
-.status-dot.pending { background: var(--warning); }
+.status-dot.pending { background: #FFB454; }
 .status-dot.paid { background: var(--accent-2); }
-.status-dot.failed, .status-dot.expired { background: var(--danger); }
+.status-dot.failed, .status-dot.expired { background: #FF5C6A; }
 
 /* ═══ БЛОКИРОВКА ═══ */
 .blocked-screen {
@@ -632,47 +656,6 @@ html, body {
     color: var(--text-dim);
 }
 
-.cat-scroll {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    margin-bottom: 22px;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-}
-.cat-scroll::-webkit-scrollbar {
-    display: none;
-}
-
-.cat-pill {
-    flex-shrink: 0;
-    padding: 10px 18px;
-    border-radius: 30px;
-    color: var(--text-dim);
-    font-size: 13.5px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--surface);
-    backdrop-filter: var(--blur);
-    -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--stroke);
-    box-shadow: var(--glass-shadow);
-}
-.cat-pill:active { transform: scale(0.94); }
-.cat-pill.active {
-    color: #fff;
-    background: var(--surface-2);
-    border-color: rgba(255,255,255,0.15);
-    box-shadow: var(--glass-shadow-active);
-}
-.cat-pill img { width: 18px; height: 18px; }
-
 /* Стиль для пустого состояния без эмодзи */
 .empty-state-icon {
     width: 48px;
@@ -681,6 +664,50 @@ html, body {
 }
 
 .app.hidden { display: none; }
+
+/* Анимация для товаров */
+.product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.product-card {
+    border-radius: var(--radius-md);
+    padding: 18px 14px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    animation: cardFadeIn 0.4s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
+}
+
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.product-card:nth-child(2) { animation-delay: 0.05s; }
+.product-card:nth-child(3) { animation-delay: 0.1s; }
+.product-card:nth-child(4) { animation-delay: 0.15s; }
+.product-card:nth-child(5) { animation-delay: 0.2s; }
+.product-card:nth-child(6) { animation-delay: 0.25s; }
+.product-card:nth-child(7) { animation-delay: 0.3s; }
+.product-card:nth-child(8) { animation-delay: 0.35s; }
+.product-card:nth-child(9) { animation-delay: 0.4s; }
+.product-card:nth-child(10) { animation-delay: 0.45s; }
+
+.product-card:active { transform: scale(0.95); }
 </style>
 </head>
 <body>
@@ -880,7 +907,7 @@ html, body {
   <div class="sheet glass" id="pay-sheet">
     <div class="sheet-handle"></div>
     <div class="pay-status" id="pay-status">
-        <div id="pay-spinner" style="display:block;">${ic('loader', 44, '#34E7C4')}</div>
+        <div id="pay-spinner" style="display:block;"><img src="" alt="loader" id="pay-spinner-icon" style="width:44px;height:44px;"></div>
         <div class="pay-status-title" id="pay-status-title">Ожидание оплаты…</div>
         <div class="pay-status-sub" id="pay-status-sub">Имитация оплаты через 3 секунды</div>
         <div class="delivered-box" id="delivered-box" style="display:none"></div>
@@ -935,7 +962,7 @@ function setupBlockedIcons() {
 function checkTelegram() {
     const tg = window.Telegram?.WebApp;
     const hasValidInitData = tg && typeof tg.initData === "string" && tg.initData.length > 20;
-    
+
     if (!hasValidInitData) {
         // Показываем блокировку
         document.getElementById('blocked-screen').classList.remove('hidden');
@@ -944,11 +971,11 @@ function checkTelegram() {
         setupBlockedIcons();
         return false;
     }
-    
+
     // Всё ок, скрываем блокировку
     document.getElementById('blocked-screen').classList.add('hidden');
     document.querySelector('.app').classList.remove('hidden');
-    
+
     tg.ready();
     tg.expand();
     tg.setHeaderColor && tg.setHeaderColor("#000000");
@@ -962,7 +989,8 @@ const isTelegram = checkTelegram();
 // Получаем данные пользователя из Telegram
 function getTelegramUser() {
   try {
-    const user = tg.initDataUnsafe?.user;
+    const tg = window.Telegram?.WebApp;
+    const user = tg?.initDataUnsafe?.user;
     if (user) {
       return {
         id: user.id,
@@ -1089,14 +1117,14 @@ const navIndicator = document.getElementById("nav-indicator");
 
 function goTo(target) {
   if (currentScreen === target) return;
-  
+
   navItems.forEach(n => n.classList.toggle("active", n.dataset.target === target));
-  
+
   screens.forEach(s => {
     s.classList.remove('active');
     s.style.display = 'none';
   });
-  
+
   const targetScreen = document.getElementById(`screen-${target}`);
   if (targetScreen) {
     targetScreen.style.display = 'block';
@@ -1104,7 +1132,7 @@ function goTo(target) {
       targetScreen.classList.add('active');
     });
   }
-  
+
   const btn = [...navItems].find(n => n.dataset.target === target);
   if (btn) {
     const items = [...navItems];
@@ -1112,13 +1140,13 @@ function goTo(target) {
     navIndicator.style.width = `calc((100% - 16px) / ${items.length})`;
     navIndicator.style.transform = `translateX(${index * 100}%)`;
   }
-  
+
   currentScreen = target;
-  
+
   if (window.tg?.HapticFeedback) {
     window.tg.HapticFeedback.impactOccurred("light");
   }
-  
+
   if (target === "orders") loadOrders();
   if (target === "admin") loadAdminStats();
 }
@@ -1138,10 +1166,10 @@ function setupIcons() {
     setIcon(document.getElementById('nav-catalog-icon'), 'grid', 22, '#8f8f8f');
     setIcon(document.getElementById('nav-orders-icon'), 'file-text', 22, '#8f8f8f');
     setIcon(document.getElementById('nav-profile-icon'), 'user', 22, '#8f8f8f');
-    
+
     // Админ
     setIcon(document.getElementById('admin-gear-icon'), 'settings', 20, '#f5f5f5');
-    
+
     // Меню профиля
     setIcon(document.getElementById('menu-orders-icon'), 'file-text', 20, '#f5f5f5');
     setIcon(document.getElementById('menu-support-icon'), 'message-circle', 20, '#f5f5f5');
@@ -1155,15 +1183,13 @@ function setupIcons() {
     setIcon(document.getElementById('btn-send-icon'), 'send', 20, '#f5f5f5');
     setIcon(document.getElementById('btn-users-icon'), 'users', 20, '#8f8f8f');
 
-    // ✅ НОВЫЕ ИКОНКИ (добавь это)
     // Пустое состояние заказов
     setIcon(document.getElementById('empty-icon'), 'inbox', 48, '#8f8f8f');
-    
+
     // Кнопка добавить товар
     setIcon(document.getElementById('btn-add-icon'), 'plus', 20, '#f5f5f5');
 
     // Иконки для статусов оплаты
-    setIcon(document.getElementById('pay-success-icon'), 'check-circle', 48, '#34E7C4');
     setIcon(document.getElementById('pay-spinner-icon'), 'loader', 44, '#34E7C4');
 }
 
@@ -1171,28 +1197,23 @@ function setupIcons() {
 // ПОЛЬЗОВАТЕЛЬ
 // ═══════════════════════════════════════════════════
 
-// ═══════════════════════════════════════════════════
-// ПОЛЬЗОВАТЕЛЬ (исправленная версия)
-// ═══════════════════════════════════════════════════
-
 function renderUser() {
     const name = CURRENT_USER.first_name || CURRENT_USER.username || "Гость";
     document.getElementById("user-name").textContent = name;
     document.getElementById("profile-name").textContent = name;
     document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
-    
+
     // Получаем элементы аватара
     const avatarEl = document.getElementById('avatar');
     const avatarLg = document.getElementById('avatar-lg');
     const initial = name[0]?.toUpperCase() || "U";
-    
+
     // Пробуем получить фото из Telegram
     let hasPhoto = false;
     try {
         const tg = window.Telegram?.WebApp;
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const user = tg.initDataUnsafe.user;
-            // Проверяем наличие photo_url
             if (user.photo_url) {
                 avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
                 avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
@@ -1203,14 +1224,11 @@ function renderUser() {
     } catch (e) {
         console.log('❌ Ошибка получения фото:', e);
     }
-    
+
     // Если нет фото - показываем инициалы
     if (!hasPhoto) {
         console.log('ℹ️ Фото не найдено, показываем инициалы');
         avatarEl.textContent = initial;
-        avatarLg.textContent = initial;
-        
-        // Стили для отображения инициалов
         avatarEl.style.display = 'flex';
         avatarEl.style.alignItems = 'center';
         avatarEl.style.justifyContent = 'center';
@@ -1218,7 +1236,8 @@ function renderUser() {
         avatarEl.style.fontSize = '17px';
         avatarEl.style.fontWeight = '800';
         avatarEl.style.color = '#fff';
-        
+
+        avatarLg.textContent = initial;
         avatarLg.style.display = 'flex';
         avatarLg.style.alignItems = 'center';
         avatarLg.style.justifyContent = 'center';
@@ -1229,7 +1248,6 @@ function renderUser() {
     }
 
     // ⭐ ПОКАЗЫВАЕМ АДМИН-ПАНЕЛЬ (всегда для демо)
-    // В продакшене используйте: if (CURRENT_USER.is_admin)
     const showAdmin = true;
     if (showAdmin) {
         const gearBtn = document.getElementById("btn-admin-gear");
@@ -1255,7 +1273,7 @@ function renderCategories() {
             </button>
         `).join("")}
     `;
-    
+
     document.getElementById("cat-scroll-home").innerHTML = html(null);
     document.getElementById("cat-scroll-catalog").innerHTML = html(SELECTED_CATEGORY);
 
@@ -1266,8 +1284,16 @@ function renderCategories() {
             document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
             const products = getProducts(catId);
-            document.getElementById("featured-products").innerHTML = products.slice(0, 4).map(productCardHTML).join("");
-            bindProductCards();
+            const container = document.getElementById("featured-products");
+            // Анимация смены контента
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(8px)';
+            setTimeout(() => {
+                container.innerHTML = products.slice(0, 4).map(productCardHTML).join("");
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+                bindProductCards();
+            }, 150);
         });
     });
 
@@ -1291,7 +1317,7 @@ function productCardHTML(p) {
     const stockBadge = p.type === "key"
         ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
         : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
-    
+
     return `
         <div class="product-card glass" data-id="${p.id}">
             <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
@@ -1304,24 +1330,32 @@ function productCardHTML(p) {
 
 function loadFeatured() {
     const products = getProducts(null).slice(0, 4);
-    document.getElementById("featured-products").innerHTML = products.map(productCardHTML).join("");
+    const container = document.getElementById("featured-products");
+    container.innerHTML = products.map(productCardHTML).join("");
     bindProductCards();
 }
 
-
 function loadCatalog() {
     const products = getProducts(SELECTED_CATEGORY);
+    const container = document.getElementById("catalog-products");
     if (products.length === 0) {
-        document.getElementById("catalog-products").innerHTML = `
+        container.innerHTML = `
             <div class="empty-state glass" style="grid-column:1/-1">
                 <div style="margin:0 auto 10px;">${ic('package', 48, '#8f8f8f')}</div>
                 <div>Товаров нет</div>
             </div>
         `;
     } else {
-        document.getElementById("catalog-products").innerHTML = products.map(productCardHTML).join("");
+        // Анимация смены контента
+        container.style.opacity = '0';
+        container.style.transform = 'translateY(8px)';
+        setTimeout(() => {
+            container.innerHTML = products.map(productCardHTML).join("");
+            container.style.opacity = '1';
+            container.style.transform = 'translateY(0)';
+            bindProductCards();
+        }, 150);
     }
-    bindProductCards();
 }
 
 function bindProductCards() {
@@ -1342,25 +1376,25 @@ const sheetOverlay = document.getElementById("sheet-overlay");
 
 function openProductSheet(p) {
   const stock = p.type === "key" ? getStock(p.id) : null;
-  
+
   // Иконка
   const iconEl = document.getElementById('sheet-icon');
   setIcon(iconEl, p.icon || 'package', 40, '#f5f5f5');
-  
+
   document.getElementById("sheet-title").textContent = p.title;
   document.getElementById("sheet-desc").textContent = p.description || "Описание товара";
   document.getElementById("sheet-price").textContent = `${p.price} ${p.asset}`;
   document.getElementById("sheet-stock").textContent =
     p.type === "key" ? (stock > 0 ? `В наличии: ${stock}` : "Нет в наличии") : `Длительность: ${p.duration_days || 30} дн`;
-  
+
   const buyBtn = document.getElementById("btn-buy");
   buyBtn.disabled = p.type === "key" && stock === 0;
   buyBtn.textContent = buyBtn.disabled ? "Нет в наличии" : "Купить через CryptoBot";
   sheetOverlay.classList.add("open");
 }
 
-sheetOverlay.addEventListener("click", (e) => { 
-  if (e.target === sheetOverlay) sheetOverlay.classList.remove("open"); 
+sheetOverlay.addEventListener("click", (e) => {
+  if (e.target === sheetOverlay) sheetOverlay.classList.remove("open");
 });
 
 document.getElementById("btn-buy").addEventListener("click", () => {
@@ -1368,10 +1402,10 @@ document.getElementById("btn-buy").addEventListener("click", () => {
   if (window.tg?.HapticFeedback) {
     window.tg.HapticFeedback.impactOccurred("medium");
   }
-  
+
   const p = SELECTED_PRODUCT;
   const stock = p.type === "key" ? getStock(p.id) : null;
-  
+
   if (p.type === "key" && stock === 0) {
     if (window.tg?.showAlert) {
       window.tg.showAlert("Товар закончился!");
@@ -1380,7 +1414,7 @@ document.getElementById("btn-buy").addEventListener("click", () => {
     }
     return;
   }
-  
+
   const order = {
     id: STORE_DATA.nextOrderId++,
     product_id: p.id,
@@ -1391,11 +1425,11 @@ document.getElementById("btn-buy").addEventListener("click", () => {
     delivered_content: null,
     created_at: new Date().toISOString(),
   };
-  
+
   STORE_DATA.orders.push(order);
   sheetOverlay.classList.remove("open");
   openPaySheet(order);
-  
+
   setTimeout(() => {
     finishPayment(order.id);
   }, 3000);
@@ -1425,10 +1459,10 @@ document.getElementById("pay-close").addEventListener("click", () => {
 function finishPayment(orderId) {
     const order = STORE_DATA.orders.find(o => o.id === orderId);
     if (!order || order.status === "paid") return;
-    
+
     const product = getProduct(order.product_id);
     let delivered = null;
-    
+
     if (product.type === "key") {
         const key = getAvailableKey(product.id);
         if (key) {
@@ -1443,30 +1477,29 @@ function finishPayment(orderId) {
     } else if (product.type === "subscription") {
         delivered = `✅ Подписка «${product.title}» активирована на ${product.duration_days} дней`;
     }
-    
+
     order.status = "paid";
     order.delivered_content = delivered;
     order.paid_at = new Date().toISOString();
-    
-    // 🎯 ИСПРАВЛЕНО: без эмодзи
+
     document.getElementById("pay-spinner").style.display = "none";
     document.getElementById("pay-close").style.display = "block";
-    
+
     const titleEl = document.getElementById("pay-status-title");
     titleEl.innerHTML = `${ic('check-circle', 24, '#34E7C4')} Оплачено!`;
-    
+
     document.getElementById("pay-status-sub").textContent = "Ваш товар готов";
-    
+
     if (delivered) {
         const box = document.getElementById("delivered-box");
         box.style.display = "block";
         box.innerHTML = `<code>${delivered}</code>`;
     }
-    
+
     if (window.tg?.HapticFeedback) {
         window.tg.HapticFeedback.notificationOccurred("success");
     }
-    
+
     loadFeatured();
     loadCatalog();
 }
@@ -1478,16 +1511,15 @@ function finishPayment(orderId) {
 function loadOrders() {
     const list = document.getElementById("order-list");
     const empty = document.getElementById("orders-empty");
-    
+
     if (!STORE_DATA.orders.length) {
         list.innerHTML = "";
         empty.style.display = "block";
         return;
     }
-    
+
     empty.style.display = "none";
     list.innerHTML = STORE_DATA.orders.map(o => {
-        // Статусы с иконками
         const statusMap = {
             pending: `<span style="display:flex;align-items:center;gap:6px;">${ic('clock', 14, '#FFB454')} Ожидание</span>`,
             paid: `<span style="display:flex;align-items:center;gap:6px;">${ic('check-circle', 14, '#34E7C4')} Оплачен</span>`,
@@ -1520,10 +1552,10 @@ adminTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     adminTabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
-    
+
     document.querySelectorAll(".admin-panel").forEach(p => p.classList.remove("active"));
     document.getElementById(`admin-${tab.dataset.adminTab}`).classList.add("active");
-    
+
     if (tab.dataset.adminTab === "products") loadAdminProducts();
     if (tab.dataset.adminTab === "orders") loadAdminOrders();
   });
@@ -1534,7 +1566,7 @@ function loadAdminStats() {
     const paidOrders = STORE_DATA.orders.filter(o => o.status === "paid");
     const revenue = paidOrders.reduce((sum, o) => sum + o.amount, 0);
     const totalProducts = STORE_DATA.products.length;
-    
+
     document.getElementById("stats-grid").innerHTML = `
         <div class="stat-card glass">
             <div class="stat-value">${revenue.toFixed(2)}</div>
@@ -1569,7 +1601,7 @@ function loadAdminProducts() {
             </div>
         `;
     }).join("");
-    
+
     document.querySelectorAll(".admin-del-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             if (confirm("Удалить товар?")) {
@@ -1583,7 +1615,6 @@ function loadAdminProducts() {
     });
 }
 
-
 document.getElementById("btn-new-product").addEventListener("click", () => {
   const title = prompt("Название товара:");
   if (!title) return;
@@ -1592,7 +1623,7 @@ document.getElementById("btn-new-product").addEventListener("click", () => {
   const icon = prompt("Имя иконки (например: tv, music, gamepad-2):") || "package";
   const type = confirm("Это подписка? OK = подписка, Cancel = разовый ключ") ? "subscription" : "key";
   const duration_days = type === "subscription" ? parseInt(prompt("Срок в днях:") || "30") : null;
-  
+
   const newProduct = {
     id: Math.max(...STORE_DATA.products.map(p => p.id)) + 1,
     category_id: STORE_DATA.categories[0].id,
@@ -1605,7 +1636,7 @@ document.getElementById("btn-new-product").addEventListener("click", () => {
     icon,
     is_active: true,
   };
-  
+
   STORE_DATA.products.push(newProduct);
   loadAdminProducts();
   loadFeatured();
@@ -1659,11 +1690,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCategories();
     loadFeatured();
     loadCatalog();
-    // Загружаем заказы если они есть
     if (STORE_DATA.orders.length) {
         loadOrders();
     }
-    
+
     setTimeout(() => {
         moveNavIndicator(document.querySelector(".nav-item.active"));
     }, 100);
