@@ -1,4 +1,4 @@
-// app.js - полностью рабочая версия с иконками
+// app.js - полная версия с плавными анимациями и оптимизацией
 
 const tg = window.tg;
 let CURRENT_USER = null;
@@ -7,17 +7,38 @@ let SELECTED_CATEGORY = null;
 let SELECTED_PRODUCT = null;
 let POLL_TIMER = null;
 
-/* ═══ Навигация ═══ */
+/* ═══ Навигация (ПЛАВНАЯ) ═══ */
 const navItems = document.querySelectorAll(".nav-item");
 const screens = document.querySelectorAll(".screen");
 const navIndicator = document.getElementById("nav-indicator");
 
 function goTo(target) {
+  // Плавное переключение с animation
   navItems.forEach(n => n.classList.toggle("active", n.dataset.target === target));
-  screens.forEach(s => s.classList.toggle("active", s.id === `screen-${target}`));
+  
+  screens.forEach(s => {
+    const isActive = s.id === `screen-${target}`;
+    if (isActive) {
+      s.style.display = 'block';
+      // Даём время на появление анимации
+      requestAnimationFrame(() => {
+        s.classList.add('active');
+      });
+    } else {
+      s.classList.remove('active');
+      // Скрываем после окончания анимации
+      setTimeout(() => {
+        if (!s.classList.contains('active')) {
+          s.style.display = 'none';
+        }
+      }, 350);
+    }
+  });
+  
   const btn = [...navItems].find(n => n.dataset.target === target);
   moveNavIndicator(btn);
   tg.HapticFeedback?.impactOccurred("light");
+  
   if (target === "orders") loadOrders();
   if (target === "admin") loadAdminStats();
 }
@@ -53,7 +74,7 @@ async function init() {
     await loadCatalog();
   } catch (e) {
     console.error("Init error:", e);
-    // Показываем сообщение об ошибке, НЕ демо-данные
+    // Показываем сообщение об ошибке
     showError("Не удалось загрузить данные. Проверьте подключение к бэкенду.");
   }
   window.addEventListener("resize", () => moveNavIndicator(document.querySelector(".nav-item.active")));
@@ -90,7 +111,7 @@ function renderCategories() {
     <button class="cat-pill glass ${activeId === null ? "active" : ""}" data-cat="">Все</button>
     ${CATEGORIES.map(c => `
       <button class="cat-pill glass ${activeId === c.id ? "active" : ""}" data-cat="${c.id}">
-        ${ic(c.icon || 'folder', 16, '#f5f5f5')} ${c.title}
+        ${c.icon ? ic(c.icon, 16, '#f5f5f5') : '📁'} ${c.title}
       </button>
     `).join("")}
   `;
@@ -352,8 +373,10 @@ async function loadAdminProducts() {
     `).join("");
     document.querySelectorAll(".admin-del-btn").forEach(btn => {
       btn.addEventListener("click", async () => {
-        await api.admin.deleteProduct(Number(btn.dataset.id));
-        loadAdminProducts();
+        if (confirm("Удалить товар?")) {
+          await api.admin.deleteProduct(Number(btn.dataset.id));
+          loadAdminProducts();
+        }
       });
     });
   } catch (e) {
@@ -378,7 +401,13 @@ document.getElementById("btn-new-product").addEventListener("click", async () =>
   
   try {
     await api.admin.createProduct({
-      category_id: CATEGORIES[0].id, title, description, price, icon, type, duration_days,
+      category_id: CATEGORIES[0].id, 
+      title, 
+      description, 
+      price, 
+      icon, 
+      type, 
+      duration_days,
     });
     loadAdminProducts();
     tg.showAlert?.("Товар создан!") || alert("Товар создан!");
@@ -406,5 +435,10 @@ async function loadAdminOrders() {
   }
 }
 
-// Запускаем приложение
-init();
+// ═══ Инициализация приложения ═══
+// Ждём загрузки всех скриптов
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
