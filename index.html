@@ -632,6 +632,54 @@ html, body {
     color: var(--text-dim);
 }
 
+.cat-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 22px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+.cat-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.cat-pill {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    border-radius: 30px;
+    color: var(--text-dim);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--stroke);
+    box-shadow: var(--glass-shadow);
+}
+.cat-pill:active { transform: scale(0.94); }
+.cat-pill.active {
+    color: #fff;
+    background: var(--surface-2);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: var(--glass-shadow-active);
+}
+.cat-pill img { width: 18px; height: 18px; }
+
+/* Стиль для пустого состояния без эмодзи */
+.empty-state-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 10px;
+}
+
 .app.hidden { display: none; }
 </style>
 </head>
@@ -730,8 +778,8 @@ html, body {
     </header>
     <div class="order-list" id="order-list"></div>
     <div class="empty-state glass" id="orders-empty" style="display:none">
-      <div style="font-size:30px;">📋</div>
-      <div>Заказов пока нет</div>
+        <div class="empty-state-icon" id="empty-icon"></div>
+        <div>Заказов пока нет</div>
     </div>
   </section>
 
@@ -778,7 +826,9 @@ html, body {
     </div>
 
     <div class="admin-panel" id="admin-products">
-      <button class="btn-primary" id="btn-new-product">+ Добавить товар</button>
+      <button class="btn-primary" id="btn-new-product" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+            <img src="" alt="add" id="btn-add-icon" style="width:20px;height:20px;"> Добавить товар
+        </button>
       <div class="admin-list" id="admin-product-list"></div>
     </div>
 
@@ -1083,26 +1133,33 @@ document.querySelectorAll("[data-goto]").forEach(el =>
 // ═══════════════════════════════════════════════════
 
 function setupIcons() {
-  // Навигация
-  setIcon(document.getElementById('nav-home-icon'), 'home', 22, '#8f8f8f');
-  setIcon(document.getElementById('nav-catalog-icon'), 'grid', 22, '#8f8f8f');
-  setIcon(document.getElementById('nav-orders-icon'), 'file-text', 22, '#8f8f8f');
-  setIcon(document.getElementById('nav-profile-icon'), 'user', 22, '#8f8f8f');
-  
-  // Админ
-  setIcon(document.getElementById('admin-gear-icon'), 'settings', 20, '#f5f5f5');
-  
-  // Меню профиля
-  setIcon(document.getElementById('menu-orders-icon'), 'file-text', 20, '#f5f5f5');
-  setIcon(document.getElementById('menu-support-icon'), 'message-circle', 20, '#f5f5f5');
-  setIcon(document.getElementById('menu-admin-icon'), 'settings', 20, '#f5f5f5');
+    // Навигация
+    setIcon(document.getElementById('nav-home-icon'), 'home', 22, '#8f8f8f');
+    setIcon(document.getElementById('nav-catalog-icon'), 'grid', 22, '#8f8f8f');
+    setIcon(document.getElementById('nav-orders-icon'), 'file-text', 22, '#8f8f8f');
+    setIcon(document.getElementById('nav-profile-icon'), 'user', 22, '#8f8f8f');
+    
+    // Админ
+    setIcon(document.getElementById('admin-gear-icon'), 'settings', 20, '#f5f5f5');
+    
+    // Меню профиля
+    setIcon(document.getElementById('menu-orders-icon'), 'file-text', 20, '#f5f5f5');
+    setIcon(document.getElementById('menu-support-icon'), 'message-circle', 20, '#f5f5f5');
+    setIcon(document.getElementById('menu-admin-icon'), 'settings', 20, '#f5f5f5');
 
-  setIcon(document.getElementById('blocked-icon'), 'send', 44, '#34E7C4');
-  setIcon(document.getElementById('feature-shield'), 'shield-check', 18, '#34E7C4');
-  setIcon(document.getElementById('feature-bolt'), 'zap', 18, '#8B6CFF');
-  setIcon(document.getElementById('feature-users'), 'users', 18, '#34E7C4');
-  setIcon(document.getElementById('btn-send-icon'), 'send', 20, '#f5f5f5');
-  setIcon(document.getElementById('btn-users-icon'), 'users', 20, '#8f8f8f');
+    // Блокировка
+    setIcon(document.getElementById('blocked-icon'), 'send', 44, '#34E7C4');
+    setIcon(document.getElementById('feature-shield'), 'shield-check', 18, '#34E7C4');
+    setIcon(document.getElementById('feature-bolt'), 'zap', 18, '#8B6CFF');
+    setIcon(document.getElementById('feature-users'), 'users', 18, '#34E7C4');
+    setIcon(document.getElementById('btn-send-icon'), 'send', 20, '#f5f5f5');
+    setIcon(document.getElementById('btn-users-icon'), 'users', 20, '#8f8f8f');
+
+    // Пустое состояние заказов
+    setIcon(document.getElementById('empty-icon'), 'inbox', 48, '#8f8f8f');
+    
+    // Кнопка добавить товар
+    setIcon(document.getElementById('btn-add-icon'), 'plus', 20, '#f5f5f5');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1110,28 +1167,34 @@ function setupIcons() {
 // ═══════════════════════════════════════════════════
 
 function renderUser() {
-  const name = CURRENT_USER.first_name || CURRENT_USER.username || "Гость";
-  document.getElementById("user-name").textContent = name;
-  document.getElementById("profile-name").textContent = name;
-  document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
-  
-  // Аватарка из Telegram
-  const avatarEl = document.getElementById('avatar');
-  const avatarLg = document.getElementById('avatar-lg');
-  
-  if (CURRENT_USER.photo_url) {
-    avatarEl.innerHTML = `<img src="${CURRENT_USER.photo_url}" alt="avatar">`;
-    avatarLg.innerHTML = `<img src="${CURRENT_USER.photo_url}" alt="avatar">`;
-  } else {
+    const name = CURRENT_USER.first_name || CURRENT_USER.username || "Гость";
+    document.getElementById("user-name").textContent = name;
+    document.getElementById("profile-name").textContent = name;
+    document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
+    
+    // Аватарка - используем инициалы с градиентом
+    const avatarEl = document.getElementById('avatar');
+    const avatarLg = document.getElementById('avatar-lg');
     const initial = name[0]?.toUpperCase() || "U";
+    
+    // Пробуем получить фото через Telegram
+    if (window.tg && window.tg.initDataUnsafe && window.tg.initDataUnsafe.user) {
+        const user = window.tg.initDataUnsafe.user;
+        if (user.photo_url) {
+            avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
+            avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
+            return;
+        }
+    }
+    
+    // Если нет фото - показываем инициалы
     avatarEl.textContent = initial;
     avatarLg.textContent = initial;
-  }
 
-  if (CURRENT_USER.is_admin) {
-    document.getElementById("btn-admin-gear").style.display = "flex";
-    document.getElementById("menu-admin").style.display = "flex";
-  }
+    if (CURRENT_USER.is_admin) {
+        document.getElementById("btn-admin-gear").style.display = "flex";
+        document.getElementById("menu-admin").style.display = "flex";
+    }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1139,27 +1202,44 @@ function renderUser() {
 // ═══════════════════════════════════════════════════
 
 function renderCategories() {
-  const html = (activeId) => `
-    <button class="cat-pill glass ${activeId === null ? "active" : ""}" data-cat="">
-      ${ic('layout-grid', 18, '#8f8f8f')} Все
-    </button>
-    ${STORE_DATA.categories.map(c => `
-      <button class="cat-pill glass ${activeId === c.id ? "active" : ""}" data-cat="${c.id}">
-        ${ic(c.icon, 18, '#8f8f8f')} ${c.title}
-      </button>
-    `).join("")}
-  `;
-  document.getElementById("cat-scroll-home").innerHTML = html(null);
-  document.getElementById("cat-scroll-catalog").innerHTML = html(SELECTED_CATEGORY);
+    const html = (activeId) => `
+        <button class="cat-pill glass ${activeId === null ? "active" : ""}" data-cat="">
+            ${ic('layout-grid', 18, '#8f8f8f')} Все
+        </button>
+        ${STORE_DATA.categories.map(c => `
+            <button class="cat-pill glass ${activeId === c.id ? "active" : ""}" data-cat="${c.id}">
+                ${ic(c.icon, 18, '#8f8f8f')} ${c.title}
+            </button>
+        `).join("")}
+    `;
+    
+    // Рендерим обе секции
+    document.getElementById("cat-scroll-home").innerHTML = html(null);
+    document.getElementById("cat-scroll-catalog").innerHTML = html(SELECTED_CATEGORY);
 
-  document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(btn => {
-    btn.addEventListener("click", () => {
-      SELECTED_CATEGORY = btn.dataset.cat ? Number(btn.dataset.cat) : null;
-      document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      loadCatalog();
+    // Обработчики для HOME
+    document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const catId = btn.dataset.cat ? Number(btn.dataset.cat) : null;
+            document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            // Фильтруем товары на главной
+            const products = getProducts(catId);
+            document.getElementById("featured-products").innerHTML = products.slice(0, 4).map(productCardHTML).join("");
+            bindProductCards();
+        });
     });
-  });
+
+    // Обработчики для CATALOG
+    document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(btn => {
+        btn.addEventListener("click", () => {
+            SELECTED_CATEGORY = btn.dataset.cat ? Number(btn.dataset.cat) : null;
+            document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            loadCatalog();
+        });
+    });
 }
 
 // ═══════════════════════════════════════════════════
@@ -1167,32 +1247,41 @@ function renderCategories() {
 // ═══════════════════════════════════════════════════
 
 function productCardHTML(p) {
-  const stock = p.type === "key" ? getStock(p.id) : null;
-  const stockBadge = p.type === "key"
-    ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
-    : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
-  
-  return `
-    <div class="product-card glass" data-id="${p.id}">
-      <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
-      <div class="product-title">${p.title}</div>
-      ${stockBadge}
-      <div class="product-price">${p.price} <span>${p.asset}</span></div>
-    </div>
-  `;
+    const stock = p.type === "key" ? getStock(p.id) : null;
+    const stockBadge = p.type === "key"
+        ? `<span class="stock-badge ${stock === 0 ? "out" : ""}">${stock === 0 ? "Нет в наличии" : `В наличии: ${stock}`}</span>`
+        : `<span class="stock-badge">Подписка · ${p.duration_days || 30} дн</span>`;
+    
+    return `
+        <div class="product-card glass" data-id="${p.id}">
+            <div class="product-icon-wrapper">${ic(p.icon || 'package', 28, '#f5f5f5')}</div>
+            <div class="product-title">${p.title}</div>
+            ${stockBadge}
+            <div class="product-price">${p.price} <span>${p.asset}</span></div>
+        </div>
+    `;
 }
 
 function loadFeatured() {
-  const products = getProducts(null).slice(0, 4);
-  document.getElementById("featured-products").innerHTML = products.map(productCardHTML).join("");
-  bindProductCards();
+    const products = getProducts(null).slice(0, 4);
+    document.getElementById("featured-products").innerHTML = products.map(productCardHTML).join("");
+    bindProductCards();
 }
 
+
 function loadCatalog() {
-  const products = getProducts(SELECTED_CATEGORY);
-  document.getElementById("catalog-products").innerHTML = products.map(productCardHTML).join("") ||
-    `<div class="empty-state glass" style="grid-column:1/-1"><div style="font-size:30px;">📭</div>Товаров нет</div>`;
-  bindProductCards();
+    const products = getProducts(SELECTED_CATEGORY);
+    if (products.length === 0) {
+        document.getElementById("catalog-products").innerHTML = `
+            <div class="empty-state glass" style="grid-column:1/-1">
+                <div class="empty-state-icon" style="margin:0 auto 10px;">${ic('package', 48, '#8f8f8f')}</div>
+                <div>Товаров нет</div>
+            </div>
+        `;
+    } else {
+        document.getElementById("catalog-products").innerHTML = products.map(productCardHTML).join("");
+    }
+    bindProductCards();
 }
 
 function bindProductCards() {
@@ -1342,35 +1431,35 @@ function finishPayment(orderId) {
 // ═══════════════════════════════════════════════════
 
 function loadOrders() {
-  const list = document.getElementById("order-list");
-  const empty = document.getElementById("orders-empty");
-  
-  if (!STORE_DATA.orders.length) {
-    list.innerHTML = "";
-    empty.style.display = "block";
-    return;
-  }
-  
-  empty.style.display = "none";
-  list.innerHTML = STORE_DATA.orders.map(o => {
-    const statusLabels = {
-      pending: "⏳ Ожидание",
-      paid: "✅ Оплачен",
-      failed: "❌ Ошибка",
-      expired: "⌛ Истёк"
-    };
-    return `
-      <div class="order-item glass">
-        <div class="order-top">
-          <span class="order-id">Заказ #${o.id}</span>
-          <span class="status-badge status-${o.status}">${statusLabels[o.status] || o.status}</span>
-        </div>
-        <div class="order-amount">${o.amount} ${o.asset}</div>
-        ${o.delivered_content ? `<div class="order-delivered"><code>${o.delivered_content}</code></div>` : ""}
-        ${o.status === "pending" ? `<span class="order-pay-link">⏳ Ожидает оплаты...</span>` : ""}
-      </div>
-    `;
-  }).join("");
+    const list = document.getElementById("order-list");
+    const empty = document.getElementById("orders-empty");
+    
+    if (!STORE_DATA.orders.length) {
+        list.innerHTML = "";
+        empty.style.display = "block";
+        return;
+    }
+    
+    empty.style.display = "none";
+    list.innerHTML = STORE_DATA.orders.map(o => {
+        const statusLabels = {
+            pending: "⏳ Ожидание",
+            paid: "✅ Оплачен",
+            failed: "❌ Ошибка",
+            expired: "⌛ Истёк"
+        };
+        return `
+            <div class="order-item glass">
+                <div class="order-top">
+                    <span class="order-id">Заказ #${o.id}</span>
+                    <span class="status-badge status-${o.status}">${statusLabels[o.status] || o.status}</span>
+                </div>
+                <div class="order-amount">${o.amount} ${o.asset}</div>
+                ${o.delivered_content ? `<div class="order-delivered"><code>${o.delivered_content}</code></div>` : ""}
+                ${o.status === "pending" ? `<span class="order-pay-link">⏳ Ожидает оплаты...</span>` : ""}
+            </div>
+        `;
+    }).join("");
 }
 
 // ═══════════════════════════════════════════════════
@@ -1409,33 +1498,34 @@ function loadAdminStats() {
 }
 
 function loadAdminProducts() {
-  const products = STORE_DATA.products;
-  document.getElementById("admin-product-list").innerHTML = products.map(p => {
-    const stock = p.type === "key" ? getStock(p.id) : "∞";
-    return `
-      <div class="admin-row glass">
-        <div class="admin-row-icon">${ic(p.icon || 'package', 20, '#f5f5f5')}</div>
-        <div class="admin-row-info">
-          <div class="admin-row-title">${p.title}</div>
-          <div class="admin-row-sub">${p.price} ${p.asset} · ${p.type === "key" ? `stock: ${stock}` : `${p.duration_days} дн`}</div>
-        </div>
-        <button class="admin-del-btn" data-id="${p.id}">${ic('x', 16, '#8f8f8f')}</button>
-      </div>
-    `;
-  }).join("");
-  
-  document.querySelectorAll(".admin-del-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (confirm("Удалить товар?")) {
-        const id = Number(btn.dataset.id);
-        STORE_DATA.products = STORE_DATA.products.filter(p => p.id !== id);
-        loadAdminProducts();
-        loadFeatured();
-        loadCatalog();
-      }
+    const products = STORE_DATA.products;
+    document.getElementById("admin-product-list").innerHTML = products.map(p => {
+        const stock = p.type === "key" ? getStock(p.id) : "∞";
+        return `
+            <div class="admin-row glass">
+                <div class="admin-row-icon">${ic(p.icon || 'package', 20, '#f5f5f5')}</div>
+                <div class="admin-row-info">
+                    <div class="admin-row-title">${p.title}</div>
+                    <div class="admin-row-sub">${p.price} ${p.asset} · ${p.type === "key" ? `stock: ${stock}` : `${p.duration_days} дн`}</div>
+                </div>
+                <button class="admin-del-btn" data-id="${p.id}">${ic('x', 16, '#8f8f8f')}</button>
+            </div>
+        `;
+    }).join("");
+    
+    document.querySelectorAll(".admin-del-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            if (confirm("Удалить товар?")) {
+                const id = Number(btn.dataset.id);
+                STORE_DATA.products = STORE_DATA.products.filter(p => p.id !== id);
+                loadAdminProducts();
+                loadFeatured();
+                loadCatalog();
+            }
+        });
     });
-  });
 }
+
 
 document.getElementById("btn-new-product").addEventListener("click", () => {
   const title = prompt("Название товара:");
@@ -1507,23 +1597,27 @@ document.getElementById("menu-support").addEventListener("click", () => {
 // ═══════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
-  setupIcons();
-  renderUser();
-  renderCategories();
-  loadFeatured();
-  loadCatalog();
-  
-  setTimeout(() => {
-    moveNavIndicator(document.querySelector(".nav-item.active"));
-  }, 100);
+    setupIcons();
+    renderUser();
+    renderCategories();
+    loadFeatured();
+    loadCatalog();
+    // Загружаем заказы если они есть
+    if (STORE_DATA.orders.length) {
+        loadOrders();
+    }
+    
+    setTimeout(() => {
+        moveNavIndicator(document.querySelector(".nav-item.active"));
+    }, 100);
 });
 
 function moveNavIndicator(btn) {
-  if (!btn) return;
-  const items = [...navItems];
-  const index = items.indexOf(btn);
-  navIndicator.style.width = `calc((100% - 16px) / ${items.length})`;
-  navIndicator.style.transform = `translateX(${index * 100}%)`;
+    if (!btn) return;
+    const items = [...navItems];
+    const index = items.indexOf(btn);
+    navIndicator.style.width = `calc((100% - 16px) / ${items.length})`;
+    navIndicator.style.transform = `translateX(${index * 100}%)`;
 }
 </script>
 </body>
