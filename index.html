@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Digital Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+<!-- фоновые размытые сферы -->
+<div class="bg-blobs">
+  <span class="blob blob-1"></span>
+  <span class="blob blob-2"></span>
+  <span class="blob blob-3"></span>
+</div>
+
+<div class="app" id="app">
+
+  <!-- ═══════ HOME ═══════ -->
+  <section class="screen active" id="screen-home">
+    <header class="topbar">
+      <div class="topbar-user">
+        <div class="avatar glass" id="avatar">U</div>
+        <div>
+          <div class="hello">Добро пожаловать</div>
+          <div class="username" id="user-name">Гость</div>
+        </div>
+      </div>
+      <button class="icon-btn glass" id="btn-admin-gear" style="display:none">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.56 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09a1.7 1.7 0 001.55-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34H9a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87V9a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.55 1z" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </header>
+
+    <div class="hero-banner glass">
+      <div class="hero-glow"></div>
+      <div class="hero-content">
+        <div class="hero-title">Цифровые товары<br>за криптовалюту</div>
+        <div class="hero-sub">Мгновенная выдача после оплаты</div>
+      </div>
+    </div>
+
+    <div class="section-head"><h3>Категории</h3></div>
+    <div class="cat-scroll" id="cat-scroll-home"></div>
+
+    <div class="section-head">
+      <h3>Популярное</h3>
+      <span class="link" data-goto="catalog">Все →</span>
+    </div>
+    <div class="product-grid" id="featured-products"></div>
+  </section>
+
+  <!-- ═══════ CATALOG ═══════ -->
+  <section class="screen" id="screen-catalog">
+    <header class="topbar">
+      <h2 class="page-title">Каталог</h2>
+    </header>
+
+    <div class="cat-scroll" id="cat-scroll-catalog"></div>
+    <div class="product-grid" id="catalog-products"></div>
+  </section>
+
+  <!-- ═══════ ORDERS ═══════ -->
+  <section class="screen" id="screen-orders">
+    <header class="topbar">
+      <h2 class="page-title">Мои заказы</h2>
+    </header>
+    <div class="order-list" id="order-list"></div>
+    <div class="empty-state glass" id="orders-empty" style="display:none">
+      <div class="empty-emoji">🧾</div>
+      <div>Заказов пока нет</div>
+    </div>
+  </section>
+
+  <!-- ═══════ PROFILE ═══════ -->
+  <section class="screen" id="screen-profile">
+    <header class="topbar">
+      <h2 class="page-title">Профиль</h2>
+    </header>
+
+    <div class="profile-card glass">
+      <div class="avatar-lg glass" id="avatar-lg">U</div>
+      <div class="profile-name" id="profile-name">—</div>
+      <div class="profile-id" id="profile-id">ID: —</div>
+    </div>
+
+    <div class="section-head"><h3>Информация</h3></div>
+    <div class="menu-list">
+      <div class="menu-item glass" data-goto="orders">
+        <span class="menu-ic glass">🧾</span> Мои заказы <span class="chev">›</span>
+      </div>
+      <div class="menu-item glass" id="menu-support">
+        <span class="menu-ic glass">💬</span> Поддержка <span class="chev">›</span>
+      </div>
+      <div class="menu-item glass" id="menu-admin" style="display:none">
+        <span class="menu-ic glass">⚙️</span> Админ-панель <span class="chev">›</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ ADMIN ═══════ -->
+  <section class="screen" id="screen-admin">
+    <header class="topbar">
+      <h2 class="page-title">Админ-панель</h2>
+    </header>
+
+    <div class="segmented glass" id="admin-tabs">
+      <div class="segmented-indicator glass-indicator" id="admin-indicator"></div>
+      <button class="segmented-item active" data-admin-tab="stats">Статистика</button>
+      <button class="segmented-item" data-admin-tab="products">Товары</button>
+      <button class="segmented-item" data-admin-tab="orders">Заказы</button>
+    </div>
+
+    <div class="admin-panel active" id="admin-stats">
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
+
+    <div class="admin-panel" id="admin-products">
+      <button class="btn-primary glass-active" id="btn-new-product">+ Добавить товар</button>
+      <div class="admin-list" id="admin-product-list"></div>
+    </div>
+
+    <div class="admin-panel" id="admin-orders">
+      <div class="admin-list" id="admin-order-list"></div>
+    </div>
+  </section>
+
+  <!-- ═══════ BOTTOM NAV ═══════ -->
+  <nav class="bottom-nav glass" id="bottom-nav">
+    <div class="nav-indicator glass-indicator" id="nav-indicator"></div>
+    <button class="nav-item active" data-target="home">
+      <svg class="nav-ic" width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 11.5L12 4l8 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9a1 1 0 001 1h3v-6h4v6h3a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" data-target="catalog">
+      <svg class="nav-ic" width="21" height="21" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span>Catalog</span>
+    </button>
+    <button class="nav-item" data-target="orders">
+      <svg class="nav-ic" width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M6 2h9l3 3v17H6V2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 9h6M9 13h6M9 17h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Orders</span>
+    </button>
+    <button class="nav-item" data-target="profile">
+      <svg class="nav-ic" width="21" height="21" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.6" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c1.4-3.7 4.3-5.5 7.5-5.5s6.1 1.8 7.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- ═══════ PRODUCT SHEET (модалка товара) ═══════ -->
+<div class="sheet-overlay" id="sheet-overlay">
+  <div class="sheet glass" id="product-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-emoji" id="sheet-emoji">🎁</div>
+    <div class="sheet-title" id="sheet-title">Название товара</div>
+    <div class="sheet-desc" id="sheet-desc">Описание</div>
+    <div class="sheet-price-row">
+      <div class="sheet-price" id="sheet-price">0 USDT</div>
+      <div class="sheet-stock" id="sheet-stock"></div>
+    </div>
+    <button class="btn-buy glass-active" id="btn-buy">Купить через CryptoBot</button>
+  </div>
+</div>
+
+<!-- ═══════ PAYMENT STATUS SHEET ═══════ -->
+<div class="sheet-overlay" id="pay-overlay">
+  <div class="sheet glass" id="pay-sheet">
+    <div class="sheet-handle"></div>
+    <div class="pay-status" id="pay-status">
+      <div class="spinner" id="pay-spinner"></div>
+      <div class="pay-status-title" id="pay-status-title">Ожидание оплаты…</div>
+      <div class="pay-status-sub" id="pay-status-sub">Проверяем платёж в CryptoBot</div>
+      <div class="delivered-box" id="delivered-box" style="display:none"></div>
+      <button class="btn-primary glass-active" id="pay-close">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/guard.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
