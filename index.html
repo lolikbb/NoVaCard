@@ -691,6 +691,22 @@ html, body {
 }
 
 .app.hidden { display: none; }
+
+/* ═══ КНОПКА СБРОСА ═══ */
+.btn-reset {
+    width: 100%;
+    background: rgba(255,92,106,0.1);
+    border: 1px solid rgba(255,92,106,0.25);
+    color: #FF5C6A;
+    padding: 15px;
+    border-radius: var(--radius-md);
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 18px;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-reset:active { transform: scale(0.96); }
 </style>
 </head>
 <body>
@@ -833,6 +849,7 @@ html, body {
 
     <div class="admin-panel active" id="admin-stats">
       <div class="stats-grid" id="stats-grid"></div>
+      <button class="btn-reset" id="btn-reset-store">🔄 Сбросить магазин</button>
     </div>
 
     <div class="admin-panel" id="admin-products">
@@ -1156,11 +1173,9 @@ function initDragScroll(container) {
     let isDragging = false;
     let startX = 0;
     let scrollLeft = 0;
-    let hasMoved = false; // ⭐ флаг, было ли движение
+    let hasMoved = false;
 
-    // ⭐ При клике на кнопку — проверяем, было ли движение
     container.addEventListener('mousedown', (e) => {
-        // Запоминаем позицию мыши
         startX = e.pageX - container.offsetLeft;
         scrollLeft = container.scrollLeft;
         hasMoved = false;
@@ -1179,8 +1194,6 @@ function initDragScroll(container) {
         if (isDragging) {
             isDragging = false;
             container.classList.remove('dragging');
-            // ⭐ Если не было движения — это был клик, ничего не делаем
-            // (кнопки сами обработают клик)
         }
     });
 
@@ -1189,14 +1202,12 @@ function initDragScroll(container) {
         e.preventDefault();
         const x = e.pageX - container.offsetLeft;
         const walk = (x - startX) * 1.2;
-        // ⭐ Если сдвиг больше 5px — считаем что это drag, а не клик
         if (Math.abs(walk) > 5) {
             hasMoved = true;
         }
         container.scrollLeft = scrollLeft - walk;
     });
 
-    // ⭐ Для тач-устройств
     let touchStartX = 0;
     let touchScrollLeft = 0;
     let touchMoved = false;
@@ -1216,11 +1227,9 @@ function initDragScroll(container) {
         container.scrollLeft = touchScrollLeft - walk;
     }, { passive: true });
 
-    // ⭐ При клике на кнопку — проверяем, было ли движение
     container.addEventListener('click', (e) => {
         const pill = e.target.closest('.cat-pill');
         if (pill) {
-            // Если был drag — отменяем клик
             if (hasMoved || touchMoved) {
                 e.stopPropagation();
                 e.preventDefault();
@@ -1379,14 +1388,12 @@ function renderCategories() {
     homeContainer.innerHTML = catHTML(null);
     catalogContainer.innerHTML = catHTML(SELECTED_CATEGORY);
 
-    // ⭐ Инициализация drag-скролла для обоих контейнеров
     initDragScroll(homeContainer);
     initDragScroll(catalogContainer);
 
     setupCategoryListeners();
 }
 
-// ═══════ ОБРАБОТЧИКИ КАТЕГОРИЙ ═══════
 function setupCategoryListeners() {
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(btn => {
         btn.removeEventListener('click', handleHomeCategoryClick);
@@ -1406,7 +1413,6 @@ function handleHomeCategoryClick(e) {
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
     this.classList.add("active");
     
-    // Прокручиваем категорию в центр при клике
     this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
     const products = getProducts(catId).slice(0, 4);
@@ -1420,7 +1426,6 @@ function handleCatalogCategoryClick(e) {
     document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
     this.classList.add("active");
     
-    // Прокручиваем категорию в центр при клике
     this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
     SELECTED_CATEGORY = catId;
@@ -1671,7 +1676,7 @@ function finishPayment(orderId) {
 }
 
 // ═══════════════════════════════════════════════════
-// ЗАКАЗЫ (только свои)
+// ЗАКАЗЫ (сортировка: новые сверху)
 // ═══════════════════════════════════════════════════
 
 function loadOrders() {
@@ -1679,6 +1684,8 @@ function loadOrders() {
     const empty = document.getElementById("orders-empty");
 
     const userOrders = STORE_DATA.orders.filter(o => o.user_id === CURRENT_USER.tg_id);
+    // Сортируем по id (новые сверху)
+    userOrders.sort((a, b) => b.id - a.id);
 
     if (!userOrders.length) {
         list.innerHTML = "";
@@ -1820,7 +1827,8 @@ document.getElementById("btn-new-product").addEventListener("click", () => {
 });
 
 function loadAdminOrders() {
-  document.getElementById("admin-order-list").innerHTML = STORE_DATA.orders.map(o => {
+  const orders = STORE_DATA.orders.slice().sort((a, b) => b.id - a.id);
+  document.getElementById("admin-order-list").innerHTML = orders.map(o => {
     const statusLabels = {
       pending: "Ожидание",
       paid: "Оплачен",
@@ -1837,6 +1845,45 @@ function loadAdminOrders() {
       </div>
     `;
   }).join("");
+}
+
+// ═══════════════════════════════════════════════════
+// СБРОС МАГАЗИНА
+// ═══════════════════════════════════════════════════
+
+document.getElementById("btn-reset-store").addEventListener("click", () => {
+    if (window.tg?.showAlert) {
+        window.tg.showAlert("⚠️ Сбросить магазин к исходному состоянию?\nВсе заказы и добавленные товары будут удалены.", () => {
+            resetStore();
+        });
+    } else {
+        if (confirm("⚠️ Сбросить магазин к исходному состоянию?\nВсе заказы и добавленные товары будут удалены.")) {
+            resetStore();
+        }
+    }
+});
+
+function resetStore() {
+    STORE_DATA.products = [...DEFAULT_PRODUCTS];
+    STORE_DATA.keys = { ...DEFAULT_KEYS };
+    STORE_DATA.usedKeys = {};
+    STORE_DATA.orders = [];
+    STORE_DATA.nextOrderId = 1;
+    saveData();
+    
+    // Обновляем UI
+    loadFeatured();
+    loadCatalog();
+    loadOrders();
+    loadAdminStats();
+    loadAdminProducts();
+    loadAdminOrders();
+    
+    if (window.tg?.showAlert) {
+        window.tg.showAlert("✅ Магазин сброшен к исходному состоянию!");
+    } else {
+        alert("✅ Магазин сброшен к исходному состоянию!");
+    }
 }
 
 // ═══════════════════════════════════════════════════
