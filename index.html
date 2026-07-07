@@ -225,6 +225,9 @@ html, body {
     cursor: grabbing;
     scroll-behavior: auto;
 }
+.cat-scroll.dragging .cat-pill {
+    pointer-events: none;
+}
 
 .cat-pill {
     flex-shrink: 0;
@@ -246,7 +249,6 @@ html, body {
     box-shadow: var(--glass-shadow);
     user-select: none;
     pointer-events: auto;
-    position: relative;
 }
 .cat-pill:active { transform: scale(0.94); }
 .cat-pill.active {
@@ -1148,8 +1150,7 @@ function getAvailableKey(productId) {
 }
 
 // ═══════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════
-// ═══════ НОВАЯ ВЕРСИЯ DRAG & SCROLL ═══════
+// DRAG & SCROLL для категорий
 // ═══════════════════════════════════════════════════
 
 function initDragScroll(container) {
@@ -1158,19 +1159,13 @@ function initDragScroll(container) {
     let isDragging = false;
     let startX = 0;
     let scrollLeft = 0;
-    let dragDistance = 0;
 
     container.addEventListener('mousedown', (e) => {
-        // Не начинаем drag если клик по кнопке
-        if (e.target.closest('.cat-pill')) return;
-        
         isDragging = true;
-        dragDistance = 0;
         container.classList.add('dragging');
         startX = e.pageX - container.offsetLeft;
         scrollLeft = container.scrollLeft;
         container.style.cursor = 'grabbing';
-        e.preventDefault();
     });
 
     container.addEventListener('mouseleave', () => {
@@ -1194,32 +1189,155 @@ function initDragScroll(container) {
         e.preventDefault();
         const x = e.pageX - container.offsetLeft;
         const walk = (x - startX) * 1.2;
-        dragDistance = Math.abs(walk);
         container.scrollLeft = scrollLeft - walk;
     });
 
-    // Touch support
     let touchStartX = 0;
     let touchScrollLeft = 0;
-    let touchDragDistance = 0;
 
     container.addEventListener('touchstart', (e) => {
         touchStartX = e.touches[0].pageX - container.offsetLeft;
         touchScrollLeft = container.scrollLeft;
-        touchDragDistance = 0;
     }, { passive: true });
 
     container.addEventListener('touchmove', (e) => {
         const x = e.touches[0].pageX - container.offsetLeft;
         const walk = (x - touchStartX) * 1.2;
-        touchDragDistance = Math.abs(walk);
         container.scrollLeft = touchScrollLeft - walk;
     }, { passive: true });
 }
 
 // ═══════════════════════════════════════════════════
+// НАВИГАЦИЯ
 // ═══════════════════════════════════════════════════
-// ═══════ НОВАЯ ВЕРСИЯ ДЛЯ КАТЕГОРИЙ ═══════
+
+const navItems = document.querySelectorAll(".nav-item");
+const screens = document.querySelectorAll(".screen");
+const navIndicator = document.getElementById("nav-indicator");
+
+function goTo(target) {
+  if (currentScreen === target) return;
+
+  navItems.forEach(n => n.classList.toggle("active", n.dataset.target === target));
+
+  screens.forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+
+  const targetScreen = document.getElementById(`screen-${target}`);
+  if (targetScreen) {
+    targetScreen.style.display = 'block';
+    requestAnimationFrame(() => {
+      targetScreen.classList.add('active');
+    });
+  }
+
+  const btn = [...navItems].find(n => n.dataset.target === target);
+  if (btn) {
+    const items = [...navItems];
+    const index = items.indexOf(btn);
+    navIndicator.style.width = `calc((100% - 16px) / ${items.length})`;
+    navIndicator.style.transform = `translateX(${index * 100}%)`;
+  }
+
+  currentScreen = target;
+
+  if (window.tg?.HapticFeedback) {
+    window.tg.HapticFeedback.impactOccurred("light");
+  }
+
+  if (target === "orders") loadOrders();
+  if (target === "admin") loadAdminStats();
+}
+
+navItems.forEach(btn => btn.addEventListener("click", () => goTo(btn.dataset.target)));
+document.querySelectorAll("[data-goto]").forEach(el =>
+  el.addEventListener("click", () => goTo(el.dataset.goto))
+);
+
+// ═══════════════════════════════════════════════════
+// УСТАНОВКА ИКОНОК
+// ═══════════════════════════════════════════════════
+
+function setupIcons() {
+    setIcon(document.getElementById('nav-home-icon'), 'home', 22, '#8f8f8f');
+    setIcon(document.getElementById('nav-catalog-icon'), 'grid', 22, '#8f8f8f');
+    setIcon(document.getElementById('nav-orders-icon'), 'file-text', 22, '#8f8f8f');
+    setIcon(document.getElementById('nav-profile-icon'), 'user', 22, '#8f8f8f');
+
+    setIcon(document.getElementById('admin-gear-icon'), 'settings', 20, '#f5f5f5');
+
+    setIcon(document.getElementById('menu-orders-icon'), 'file-text', 20, '#f5f5f5');
+    setIcon(document.getElementById('menu-support-icon'), 'message-circle', 20, '#f5f5f5');
+    setIcon(document.getElementById('menu-admin-icon'), 'settings', 20, '#f5f5f5');
+
+    setIcon(document.getElementById('blocked-icon'), 'send', 44, '#34E7C4');
+    setIcon(document.getElementById('feature-shield'), 'shield-check', 18, '#34E7C4');
+    setIcon(document.getElementById('feature-bolt'), 'zap', 18, '#8B6CFF');
+    setIcon(document.getElementById('feature-users'), 'users', 18, '#34E7C4');
+    setIcon(document.getElementById('btn-send-icon'), 'send', 20, '#f5f5f5');
+    setIcon(document.getElementById('btn-users-icon'), 'users', 20, '#8f8f8f');
+
+    setIcon(document.getElementById('empty-icon'), 'inbox', 48, '#8f8f8f');
+    setIcon(document.getElementById('btn-add-icon'), 'plus', 20, '#f5f5f5');
+    setIcon(document.getElementById('pay-spinner-icon'), 'loader', 44, '#34E7C4');
+}
+
+// ═══════════════════════════════════════════════════
+// ПОЛЬЗОВАТЕЛЬ
+// ═══════════════════════════════════════════════════
+
+function renderUser() {
+    const name = CURRENT_USER.first_name || CURRENT_USER.username || "Гость";
+    document.getElementById("user-name").textContent = name;
+    document.getElementById("profile-name").textContent = name;
+    document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
+
+    const avatarEl = document.getElementById('avatar');
+    const avatarLg = document.getElementById('avatar-lg');
+    const initial = name[0]?.toUpperCase() || "U";
+
+    avatarEl.innerHTML = '';
+    avatarLg.innerHTML = '';
+
+    let hasPhoto = false;
+
+    try {
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            if (user.photo_url) {
+                avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
+                avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
+                hasPhoto = true;
+            }
+        }
+    } catch (e) {
+        console.log('❌ Ошибка получения фото:', e);
+    }
+
+    if (!hasPhoto) {
+        avatarEl.textContent = initial;
+        avatarLg.textContent = initial;
+    }
+
+    const showAdmin = CURRENT_USER.is_admin;
+    const gearBtn = document.getElementById("btn-admin-gear");
+    const menuAdmin = document.getElementById("menu-admin");
+    
+    if (showAdmin) {
+        if (gearBtn) gearBtn.style.display = "flex";
+        if (menuAdmin) menuAdmin.style.display = "flex";
+    } else {
+        if (gearBtn) gearBtn.style.display = "none";
+        if (menuAdmin) menuAdmin.style.display = "none";
+    }
+}
+
+// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// ═══════ ГЛАВНАЯ ФУНКЦИЯ КАТЕГОРИЙ ═══════
 // ═══════════════════════════════════════════════════
 
 function renderCategories() {
@@ -1238,18 +1356,15 @@ function renderCategories() {
     homeContainer.innerHTML = catHTML(null);
     catalogContainer.innerHTML = catHTML(SELECTED_CATEGORY);
 
-    // Инициализируем drag & scroll
-    initDragScroll(homeContainer);
-    initDragScroll(catalogContainer);
-
-    // Навешиваем обработчики кликов на кнопки
+    // Навешиваем обработчики на ВСЕ кнопки категорий
     setupCategoryListeners();
 }
 
-// ═══════ ОБРАБОТЧИКИ КЛИКОВ ПО КНОПКАМ ═══════
+// ═══════ ЕДИНАЯ ФУНКЦИЯ ДЛЯ ОБРАБОТЧИКОВ КАТЕГОРИЙ ═══════
 function setupCategoryListeners() {
     // ⭐ Обработчики для HOME
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(btn => {
+        // Убираем старые обработчики
         btn.removeEventListener('click', handleHomeCategoryClick);
         btn.addEventListener('click', handleHomeCategoryClick);
     });
@@ -1713,57 +1828,6 @@ function loadAdminOrders() {
 }
 
 // ═══════════════════════════════════════════════════
-// ПОЛЬЗОВАТЕЛЬ
-// ═══════════════════════════════════════════════════
-
-function renderUser() {
-    const name = CURRENT_USER.first_name || CURRENT_USER.username || "Гость";
-    document.getElementById("user-name").textContent = name;
-    document.getElementById("profile-name").textContent = name;
-    document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
-
-    const avatarEl = document.getElementById('avatar');
-    const avatarLg = document.getElementById('avatar-lg');
-    const initial = name[0]?.toUpperCase() || "U";
-
-    avatarEl.innerHTML = '';
-    avatarLg.innerHTML = '';
-
-    let hasPhoto = false;
-
-    try {
-        const tg = window.Telegram?.WebApp;
-        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            if (user.photo_url) {
-                avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
-                avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
-                hasPhoto = true;
-            }
-        }
-    } catch (e) {
-        console.log('❌ Ошибка получения фото:', e);
-    }
-
-    if (!hasPhoto) {
-        avatarEl.textContent = initial;
-        avatarLg.textContent = initial;
-    }
-
-    const showAdmin = CURRENT_USER.is_admin;
-    const gearBtn = document.getElementById("btn-admin-gear");
-    const menuAdmin = document.getElementById("menu-admin");
-    
-    if (showAdmin) {
-        if (gearBtn) gearBtn.style.display = "flex";
-        if (menuAdmin) menuAdmin.style.display = "flex";
-    } else {
-        if (gearBtn) gearBtn.style.display = "none";
-        if (menuAdmin) menuAdmin.style.display = "none";
-    }
-}
-
-// ═══════════════════════════════════════════════════
 // ПОДДЕРЖКА
 // ═══════════════════════════════════════════════════
 
@@ -1774,55 +1838,6 @@ document.getElementById("menu-support").addEventListener("click", () => {
     window.open("https://t.me/your_bot_username", "_blank");
   }
 });
-
-// ═══════════════════════════════════════════════════
-// НАВИГАЦИЯ
-// ═══════════════════════════════════════════════════
-
-const navItems = document.querySelectorAll(".nav-item");
-const screens = document.querySelectorAll(".screen");
-const navIndicator = document.getElementById("nav-indicator");
-
-function goTo(target) {
-  if (currentScreen === target) return;
-
-  navItems.forEach(n => n.classList.toggle("active", n.dataset.target === target));
-
-  screens.forEach(s => {
-    s.classList.remove('active');
-    s.style.display = 'none';
-  });
-
-  const targetScreen = document.getElementById(`screen-${target}`);
-  if (targetScreen) {
-    targetScreen.style.display = 'block';
-    requestAnimationFrame(() => {
-      targetScreen.classList.add('active');
-    });
-  }
-
-  const btn = [...navItems].find(n => n.dataset.target === target);
-  if (btn) {
-    const items = [...navItems];
-    const index = items.indexOf(btn);
-    navIndicator.style.width = `calc((100% - 16px) / ${items.length})`;
-    navIndicator.style.transform = `translateX(${index * 100}%)`;
-  }
-
-  currentScreen = target;
-
-  if (window.tg?.HapticFeedback) {
-    window.tg.HapticFeedback.impactOccurred("light");
-  }
-
-  if (target === "orders") loadOrders();
-  if (target === "admin") loadAdminStats();
-}
-
-navItems.forEach(btn => btn.addEventListener("click", () => goTo(btn.dataset.target)));
-document.querySelectorAll("[data-goto]").forEach(el =>
-  el.addEventListener("click", () => goTo(el.dataset.goto))
-);
 
 // ═══════════════════════════════════════════════════
 // ЗАПУСК
@@ -1836,6 +1851,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCatalog();
     loadOrders();
 
+    // ⭐ Тест: проверяем, что обработчики работают
     console.log('✅ Приложение загружено, категории готовы');
     console.log('📊 Всего товаров:', STORE_DATA.products.length);
     console.log('📦 Всего заказов:', STORE_DATA.orders.length);
