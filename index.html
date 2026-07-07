@@ -1001,9 +1001,9 @@ function saveData() {
             nextOrderId: STORE_DATA.nextOrderId,
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        console.log('✅ Данные сохранены');
+        console.log('Данные сохранены');
     } catch (e) {
-        console.log('❌ Ошибка сохранения:', e);
+        console.log('Ошибка сохранения:', e);
     }
 }
 
@@ -1021,7 +1021,7 @@ function loadData() {
             return true;
         }
     } catch (e) {
-        console.log('❌ Ошибка загрузки данных:', e);
+        console.log('Ошибка загрузки данных:', e);
     }
     return false;
 }
@@ -1339,7 +1339,7 @@ function renderUser() {
             }
         }
     } catch (e) {
-        console.log('❌ Ошибка получения фото:', e);
+        console.log('Ошибка получения фото:', e);
     }
 
     if (!hasPhoto) {
@@ -1637,7 +1637,7 @@ function finishPayment(orderId) {
             STORE_DATA.usedKeys[product.id].push(key);
             delivered = key;
         } else {
-            delivered = "❌ Ключи закончились, обратитесь в поддержку";
+            delivered = "Ключи закончились, обратитесь в поддержку";
         }
     } else if (product.type === "subscription") {
         delivered = `Подписка «${product.title}» активирована на ${product.duration_days} дней`;
