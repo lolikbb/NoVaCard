@@ -1640,7 +1640,7 @@ function finishPayment(orderId) {
             delivered = "❌ Ключи закончились, обратитесь в поддержку";
         }
     } else if (product.type === "subscription") {
-        delivered = `✅ Подписка «${product.title}» активирована на ${product.duration_days} дней`;
+        delivered = `Подписка «${product.title}» активирована на ${product.duration_days} дней`;
     }
 
     order.status = "paid";
@@ -1813,19 +1813,19 @@ document.getElementById("btn-new-product").addEventListener("click", () => {
   loadFeatured();
   loadCatalog();
   if (window.tg?.showAlert) {
-    window.tg.showAlert("✅ Товар создан!");
+    window.tg.showAlert("Товар создан!");
   } else {
-    alert("✅ Товар создан!");
+    alert("Товар создан!");
   }
 });
 
 function loadAdminOrders() {
   document.getElementById("admin-order-list").innerHTML = STORE_DATA.orders.map(o => {
     const statusLabels = {
-      pending: "⏳ Ожидание",
-      paid: "✅ Оплачен",
-      failed: "❌ Ошибка",
-      expired: "⌛ Истёк"
+      pending: "Ожидание",
+      paid: "Оплачен",
+      failed: "Ошибка",
+      expired: "Истёк"
     };
     return `
       <div class="admin-row glass">
