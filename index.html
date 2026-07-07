@@ -64,6 +64,7 @@
     box-shadow: var(--glass-shadow);
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
+    will-change: transform, background, box-shadow;
 }
 
 .glass-active { box-shadow: var(--glass-shadow-active); }
@@ -90,6 +91,7 @@ html, body {
     overflow: hidden; pointer-events: none;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
+    will-change: transform;
 }
 
 .blob {
@@ -122,12 +124,12 @@ html, body {
 
 .screen {
     display: none;
-    animation: fadeUp 0.35s cubic-bezier(0.25, 0.9, 0.35, 1);
+    animation: fadeUp 0.25s cubic-bezier(0.25, 0.9, 0.35, 1);
 }
 .screen.active { display: block; }
 
 @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -143,6 +145,8 @@ html, body {
     color: #fff;
     overflow: hidden;
     flex-shrink: 0;
+    font-size: 17px;
+    text-transform: uppercase;
 }
 .avatar img, .avatar-lg img {
     width: 100%;
@@ -163,12 +167,13 @@ html, body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
     background: var(--surface);
     backdrop-filter: var(--blur);
     -webkit-backdrop-filter: var(--blur);
     border: 1px solid var(--stroke);
     box-shadow: var(--glass-shadow);
+    will-change: transform, background;
 }
 .icon-btn:active { transform: scale(0.88); }
 .icon-btn img { width: 20px; height: 20px; }
@@ -182,6 +187,7 @@ html, body {
     background: linear-gradient(160deg, rgba(139,108,255,0.16), rgba(0,0,0,0.4));
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
+    will-change: transform;
 }
 .hero-glow {
     position: absolute; top: -50%; right: -30%;
@@ -234,7 +240,7 @@ html, body {
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     white-space: nowrap;
     display: flex;
     align-items: center;
@@ -246,6 +252,7 @@ html, body {
     box-shadow: var(--glass-shadow);
     user-select: none;
     pointer-events: auto;
+    will-change: transform, background, color, box-shadow;
 }
 .cat-pill:active { transform: scale(0.94); }
 .cat-pill.active {
@@ -264,12 +271,12 @@ html, body {
     margin-bottom: 6px;
     min-height: 150px;
     opacity: 1;
-    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 0.9, 0.35, 1);
+    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.25, 0.9, 0.35, 1);
 }
 
 .product-grid.fade-out {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(8px) scale(0.98);
 }
 
 .product-grid .product-card {
@@ -281,8 +288,9 @@ html, body {
     gap: 8px;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
     opacity: 1;
+    will-change: transform, background, box-shadow;
 }
 .product-grid .product-card:active { transform: scale(0.95); }
 
@@ -355,7 +363,8 @@ html, body {
     padding: 15px 16px;
     font-size: 14.5px; font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform, background, box-shadow;
 }
 .menu-item:active { transform: scale(0.96); }
 .menu-ic {
@@ -375,13 +384,14 @@ html, body {
     border-radius: 26px;
     display: flex; padding: 8px;
     z-index: 50;
+    will-change: transform, background, box-shadow;
 }
 .nav-indicator {
     position: absolute; top: 8px; bottom: 8px; left: 8px;
     width: calc((100% - 16px) / 4);
     background: rgba(255,255,255,0.09);
     border-radius: 19px;
-    transition: transform 0.35s cubic-bezier(0.5, 1.5, 0.4, 1);
+    transition: transform 0.3s cubic-bezier(0.5, 1.5, 0.4, 1);
     will-change: transform;
     z-index: 0;
 }
@@ -393,12 +403,14 @@ html, body {
     color: var(--text-dim2);
     font-size: 10.5px; font-weight: 600;
     cursor: pointer;
-    transition: color 0.25s ease;
+    transition: color 0.2s ease;
+    will-change: color;
 }
 .nav-item.active { color: #fff; }
 .nav-item:active { transform: scale(0.92); }
 .nav-ic {
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform;
 }
 .nav-item.active .nav-ic {
     transform: translateY(-2px) scale(1.05);
@@ -411,7 +423,7 @@ html, body {
     backdrop-filter: blur(4px);
     display: flex; align-items: flex-end;
     opacity: 0; pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.25s ease;
     z-index: 100;
 }
 .sheet-overlay.open { opacity: 1; pointer-events: all; }
@@ -420,7 +432,8 @@ html, body {
     border-radius: 28px 28px 0 0;
     padding: 14px 22px 32px;
     transform: translateY(30px);
-    transition: transform 0.4s cubic-bezier(0.25, 0.9, 0.35, 1);
+    transition: transform 0.35s cubic-bezier(0.25, 0.9, 0.35, 1);
+    will-change: transform, background, box-shadow;
 }
 .sheet-overlay.open .sheet { transform: translateY(0); }
 .sheet-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px; margin: 0 auto 20px; }
@@ -448,8 +461,9 @@ html, body {
     padding: 17px; border-radius: 18px;
     font-size: 15px; font-weight: 700;
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
     box-shadow: var(--glass-shadow-active);
+    will-change: transform, background, box-shadow;
 }
 .btn-buy:active { transform: scale(0.96); }
 .btn-buy:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
@@ -479,9 +493,10 @@ html, body {
     padding: 17px; border-radius: 18px;
     font-size: 15px; font-weight: 700;
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
     box-shadow: var(--glass-shadow-active);
     margin-top: 8px;
+    will-change: transform, background, box-shadow;
 }
 .btn-close:active { transform: scale(0.96); }
 
@@ -506,6 +521,7 @@ html, body {
     cursor: pointer;
     border-radius: 14px;
     transition: all 0.2s ease;
+    will-change: color, background, box-shadow;
 }
 .admin-tab.active {
     color: #fff;
@@ -515,7 +531,7 @@ html, body {
 .admin-tab:active { transform: scale(0.96); }
 
 .admin-panel { display: none; }
-.admin-panel.active { display: block; animation: fadeUp 0.3s ease; }
+.admin-panel.active { display: block; animation: fadeUp 0.2s ease; }
 
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .stat-card { border-radius: var(--radius-md); padding: 20px 16px; }
@@ -532,8 +548,9 @@ html, body {
     font-size: 14.5px; font-weight: 700;
     cursor: pointer;
     margin-bottom: 18px;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
     box-shadow: var(--glass-shadow-active);
+    will-change: transform, background, box-shadow;
 }
 .btn-primary:active { transform: scale(0.96); }
 
@@ -563,10 +580,11 @@ html, body {
     color: var(--text-dim);
     font-weight: 700;
     cursor: pointer;
-    transition: transform 0.15s ease, color 0.2s ease;
+    transition: transform 0.15s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    will-change: transform, color, background, box-shadow;
 }
 .admin-del-btn:active { transform: scale(0.85); color: #FF5C6A; }
 .admin-del-btn img { width: 16px; height: 16px; }
@@ -671,9 +689,10 @@ html, body {
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
     text-decoration: none;
     border: none;
+    will-change: transform, background, box-shadow;
 }
 .blocked-btn:active { transform: scale(0.96); }
 .blocked-btn img { width: 20px; height: 20px; }
@@ -704,7 +723,8 @@ html, body {
     font-weight: 700;
     cursor: pointer;
     margin-top: 18px;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform, background, box-shadow;
 }
 .btn-reset:active { transform: scale(0.96); }
 </style>
@@ -849,7 +869,7 @@ html, body {
 
     <div class="admin-panel active" id="admin-stats">
       <div class="stats-grid" id="stats-grid"></div>
-      <button class="btn-reset" id="btn-reset-store">Сбросить магазин</button>
+      <button class="btn-reset" id="btn-reset-store">🔄 Сбросить магазин</button>
     </div>
 
     <div class="admin-panel" id="admin-products">
@@ -1164,7 +1184,7 @@ function getAvailableKey(productId) {
 }
 
 // ═══════════════════════════════════════════════════
-// ═══ НОВЫЙ DRAG & SCROLL для категорий ═══
+// ═══ DRAG & SCROLL для категорий ═══
 // ═══════════════════════════════════════════════════
 
 function initDragScroll(container) {
@@ -1324,19 +1344,20 @@ function setupIcons() {
 
 function renderUser() {
     const name = CURRENT_USER.first_name || CURRENT_USER.username || "Гость";
+    const initial = name.charAt(0).toUpperCase() || "U";
+    
     document.getElementById("user-name").textContent = name;
     document.getElementById("profile-name").textContent = name;
     document.getElementById("profile-id").textContent = `ID: ${CURRENT_USER.tg_id}`;
 
     const avatarEl = document.getElementById('avatar');
     const avatarLg = document.getElementById('avatar-lg');
-    const initial = name[0]?.toUpperCase() || "U";
 
-    avatarEl.innerHTML = '';
-    avatarLg.innerHTML = '';
+    // Всегда показываем инициал
+    avatarEl.textContent = initial;
+    avatarLg.textContent = initial;
 
-    let hasPhoto = false;
-
+    // Если есть фото — показываем его поверх
     try {
         const tg = window.Telegram?.WebApp;
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
@@ -1344,16 +1365,10 @@ function renderUser() {
             if (user.photo_url) {
                 avatarEl.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
                 avatarLg.innerHTML = `<img src="${user.photo_url}" alt="avatar">`;
-                hasPhoto = true;
             }
         }
     } catch (e) {
         console.log('Ошибка получения фото:', e);
-    }
-
-    if (!hasPhoto) {
-        avatarEl.textContent = initial;
-        avatarLg.textContent = initial;
     }
 
     const showAdmin = CURRENT_USER.is_admin;
@@ -1471,7 +1486,7 @@ function updateProducts(containerId, products) {
         }
 
         container.classList.remove('fade-out');
-    }, 350);
+    }, 250);
 }
 
 function bindProductCards(container) {
@@ -1684,7 +1699,6 @@ function loadOrders() {
     const empty = document.getElementById("orders-empty");
 
     const userOrders = STORE_DATA.orders.filter(o => o.user_id === CURRENT_USER.tg_id);
-    // Сортируем по id (новые сверху)
     userOrders.sort((a, b) => b.id - a.id);
 
     if (!userOrders.length) {
@@ -1871,7 +1885,6 @@ function resetStore() {
     STORE_DATA.nextOrderId = 1;
     saveData();
     
-    // Обновляем UI
     loadFeatured();
     loadCatalog();
     loadOrders();
@@ -1880,9 +1893,9 @@ function resetStore() {
     loadAdminOrders();
     
     if (window.tg?.showAlert) {
-        window.tg.showAlert("Магазин сброшен к исходному состоянию!");
+        window.tg.showAlert("✅ Магазин сброшен к исходному состоянию!");
     } else {
-        alert("Магазин сброшен к исходному состоянию!");
+        alert("✅ Магазин сброшен к исходному состоянию!");
     }
 }
 
@@ -1916,7 +1929,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
         moveNavIndicator(document.querySelector(".nav-item.active"));
-    }, 100);
+    }, 50);
 });
 
 function moveNavIndicator(btn) {
