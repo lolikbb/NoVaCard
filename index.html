@@ -204,7 +204,7 @@ html, body {
 }
 .section-head .link:active { color: var(--accent-2); }
 
-/* ═══ СКРОЛЛ КАТЕГОРИЙ — DRAG & SCROLL ═══ */
+/* ═══ СКРОЛЛ КАТЕГОРИЙ — DRAG & SCROLL + КЛИК ═══ */
 .cat-scroll {
     display: flex;
     gap: 10px;
@@ -1150,7 +1150,7 @@ function getAvailableKey(productId) {
 }
 
 // ═══════════════════════════════════════════════════
-// DRAG & SCROLL для категорий
+// DRAG & SCROLL для категорий + КЛИК ДЛЯ СКРОЛЛА
 // ═══════════════════════════════════════════════════
 
 function initDragScroll(container) {
@@ -1205,6 +1205,25 @@ function initDragScroll(container) {
         const walk = (x - touchStartX) * 1.2;
         container.scrollLeft = touchScrollLeft - walk;
     }, { passive: true });
+
+    // ⭐ НОВОЕ: скролл при клике на пустое место контейнера
+    container.addEventListener('click', (e) => {
+        // Если клик был по самой категории — не мешаем, она сама обработает
+        if (e.target.closest('.cat-pill')) return;
+
+        // Клик по пустому месту — прокручиваем на один шаг в зависимости от стороны
+        const rect = container.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const halfWidth = rect.width / 2;
+
+        if (clickX < halfWidth) {
+            // Клик слева — скроллим назад
+            container.scrollBy({ left: -200, behavior: 'smooth' });
+        } else {
+            // Клик справа — скроллим вперёд
+            container.scrollBy({ left: 200, behavior: 'smooth' });
+        }
+    });
 }
 
 // ═══════════════════════════════════════════════════
@@ -1336,15 +1355,13 @@ function renderUser() {
 }
 
 // ═══════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════
-// ═══════ ГЛАВНАЯ ФУНКЦИЯ КАТЕГОРИЙ ═══════
+// ═══════ КАТЕГОРИИ ═══════
 // ═══════════════════════════════════════════════════
 
 function renderCategories() {
     const homeContainer = document.getElementById("cat-scroll-home");
     const catalogContainer = document.getElementById("cat-scroll-catalog");
 
-    // Создаём HTML для категорий
     const catHTML = (activeId) => {
         let html = `<button class="cat-pill glass ${activeId === null ? 'active' : ''}" data-cat="">${ic('layout-grid', 18, '#8f8f8f')} Все</button>`;
         STORE_DATA.categories.forEach(c => {
@@ -1356,59 +1373,53 @@ function renderCategories() {
     homeContainer.innerHTML = catHTML(null);
     catalogContainer.innerHTML = catHTML(SELECTED_CATEGORY);
 
-    // Навешиваем обработчики на ВСЕ кнопки категорий
+    // Инициализация drag-скролла для обоих контейнеров
+    initDragScroll(homeContainer);
+    initDragScroll(catalogContainer);
+
     setupCategoryListeners();
 }
 
-// ═══════ ЕДИНАЯ ФУНКЦИЯ ДЛЯ ОБРАБОТЧИКОВ КАТЕГОРИЙ ═══════
+// ═══════ ОБРАБОТЧИКИ КАТЕГОРИЙ ═══════
 function setupCategoryListeners() {
-    // ⭐ Обработчики для HOME
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(btn => {
-        // Убираем старые обработчики
         btn.removeEventListener('click', handleHomeCategoryClick);
         btn.addEventListener('click', handleHomeCategoryClick);
     });
 
-    // ⭐ Обработчики для CATALOG
     document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(btn => {
         btn.removeEventListener('click', handleCatalogCategoryClick);
         btn.addEventListener('click', handleCatalogCategoryClick);
     });
 }
 
-// ═══════ ОБРАБОТЧИК ДЛЯ HOME ═══════
 function handleHomeCategoryClick(e) {
     e.stopPropagation();
     const catId = this.dataset.cat ? Number(this.dataset.cat) : null;
     
-    // Обновляем активный класс
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
     this.classList.add("active");
     
-    // Получаем товары и обновляем
+    // ⭐ Прокручиваем категорию в центр при клике
+    this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
     const products = getProducts(catId).slice(0, 4);
     updateProducts('featured-products', products);
-    
-    console.log('🏠 HOME категория выбрана:', catId || 'Все');
 }
 
-// ═══════ ОБРАБОТЧИК ДЛЯ CATALOG ═══════
 function handleCatalogCategoryClick(e) {
     e.stopPropagation();
     const catId = this.dataset.cat ? Number(this.dataset.cat) : null;
     
-    // Обновляем активный класс
     document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
     this.classList.add("active");
     
-    // Сохраняем выбранную категорию
+    // ⭐ Прокручиваем категорию в центр при клике
+    this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
     SELECTED_CATEGORY = catId;
-    
-    // Получаем товары и обновляем
     const products = getProducts(catId);
     updateProducts('catalog-products', products);
-    
-    console.log('📦 CATALOG категория выбрана:', catId || 'Все');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1417,12 +1428,7 @@ function handleCatalogCategoryClick(e) {
 
 function updateProducts(containerId, products) {
     const container = document.getElementById(containerId);
-    if (!container) {
-        console.log('❌ Контейнер не найден:', containerId);
-        return;
-    }
-
-    console.log('🔄 Обновление товаров в', containerId, 'кол-во:', products.length);
+    if (!container) return;
 
     container.classList.add('fade-out');
 
@@ -1851,8 +1857,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCatalog();
     loadOrders();
 
-    // ⭐ Тест: проверяем, что обработчики работают
-    console.log('✅ Приложение загружено, категории готовы');
+    console.log('✅ Приложение загружено');
     console.log('📊 Всего товаров:', STORE_DATA.products.length);
     console.log('📦 Всего заказов:', STORE_DATA.orders.length);
 
