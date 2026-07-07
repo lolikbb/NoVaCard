@@ -204,7 +204,7 @@ html, body {
 }
 .section-head .link:active { color: var(--accent-2); }
 
-/* ═══ СКРОЛЛ КАТЕГОРИЙ — DRAG & SCROLL + КЛИК ═══ */
+/* ═══ СКРОЛЛ КАТЕГОРИЙ — DRAG & SCROLL ═══ */
 .cat-scroll {
     display: flex;
     gap: 10px;
@@ -224,9 +224,6 @@ html, body {
 .cat-scroll.dragging {
     cursor: grabbing;
     scroll-behavior: auto;
-}
-.cat-scroll.dragging .cat-pill {
-    pointer-events: none;
 }
 
 .cat-pill {
@@ -1150,7 +1147,7 @@ function getAvailableKey(productId) {
 }
 
 // ═══════════════════════════════════════════════════
-// DRAG & SCROLL для категорий + КЛИК ДЛЯ СКРОЛЛА
+// ═══ НОВЫЙ DRAG & SCROLL для категорий ═══
 // ═══════════════════════════════════════════════════
 
 function initDragScroll(container) {
@@ -1159,20 +1156,22 @@ function initDragScroll(container) {
     let isDragging = false;
     let startX = 0;
     let scrollLeft = 0;
+    let hasMoved = false; // ⭐ флаг, было ли движение
 
+    // ⭐ При клике на кнопку — проверяем, было ли движение
     container.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        container.classList.add('dragging');
+        // Запоминаем позицию мыши
         startX = e.pageX - container.offsetLeft;
         scrollLeft = container.scrollLeft;
-        container.style.cursor = 'grabbing';
+        hasMoved = false;
+        isDragging = true;
+        container.classList.add('dragging');
     });
 
     container.addEventListener('mouseleave', () => {
         if (isDragging) {
             isDragging = false;
             container.classList.remove('dragging');
-            container.style.cursor = 'grab';
         }
     });
 
@@ -1180,7 +1179,8 @@ function initDragScroll(container) {
         if (isDragging) {
             isDragging = false;
             container.classList.remove('dragging');
-            container.style.cursor = 'grab';
+            // ⭐ Если не было движения — это был клик, ничего не делаем
+            // (кнопки сами обработают клик)
         }
     });
 
@@ -1189,41 +1189,47 @@ function initDragScroll(container) {
         e.preventDefault();
         const x = e.pageX - container.offsetLeft;
         const walk = (x - startX) * 1.2;
+        // ⭐ Если сдвиг больше 5px — считаем что это drag, а не клик
+        if (Math.abs(walk) > 5) {
+            hasMoved = true;
+        }
         container.scrollLeft = scrollLeft - walk;
     });
 
+    // ⭐ Для тач-устройств
     let touchStartX = 0;
     let touchScrollLeft = 0;
+    let touchMoved = false;
 
     container.addEventListener('touchstart', (e) => {
         touchStartX = e.touches[0].pageX - container.offsetLeft;
         touchScrollLeft = container.scrollLeft;
+        touchMoved = false;
     }, { passive: true });
 
     container.addEventListener('touchmove', (e) => {
         const x = e.touches[0].pageX - container.offsetLeft;
         const walk = (x - touchStartX) * 1.2;
+        if (Math.abs(walk) > 5) {
+            touchMoved = true;
+        }
         container.scrollLeft = touchScrollLeft - walk;
     }, { passive: true });
 
-    // ⭐ НОВОЕ: скролл при клике на пустое место контейнера
+    // ⭐ При клике на кнопку — проверяем, было ли движение
     container.addEventListener('click', (e) => {
-        // Если клик был по самой категории — не мешаем, она сама обработает
-        if (e.target.closest('.cat-pill')) return;
-
-        // Клик по пустому месту — прокручиваем на один шаг в зависимости от стороны
-        const rect = container.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const halfWidth = rect.width / 2;
-
-        if (clickX < halfWidth) {
-            // Клик слева — скроллим назад
-            container.scrollBy({ left: -200, behavior: 'smooth' });
-        } else {
-            // Клик справа — скроллим вперёд
-            container.scrollBy({ left: 200, behavior: 'smooth' });
+        const pill = e.target.closest('.cat-pill');
+        if (pill) {
+            // Если был drag — отменяем клик
+            if (hasMoved || touchMoved) {
+                e.stopPropagation();
+                e.preventDefault();
+                hasMoved = false;
+                touchMoved = false;
+                return;
+            }
         }
-    });
+    }, true);
 }
 
 // ═══════════════════════════════════════════════════
@@ -1373,7 +1379,7 @@ function renderCategories() {
     homeContainer.innerHTML = catHTML(null);
     catalogContainer.innerHTML = catHTML(SELECTED_CATEGORY);
 
-    // Инициализация drag-скролла для обоих контейнеров
+    // ⭐ Инициализация drag-скролла для обоих контейнеров
     initDragScroll(homeContainer);
     initDragScroll(catalogContainer);
 
@@ -1400,7 +1406,7 @@ function handleHomeCategoryClick(e) {
     document.querySelectorAll("#cat-scroll-home .cat-pill").forEach(b => b.classList.remove("active"));
     this.classList.add("active");
     
-    // ⭐ Прокручиваем категорию в центр при клике
+    // Прокручиваем категорию в центр при клике
     this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
     const products = getProducts(catId).slice(0, 4);
@@ -1414,7 +1420,7 @@ function handleCatalogCategoryClick(e) {
     document.querySelectorAll("#cat-scroll-catalog .cat-pill").forEach(b => b.classList.remove("active"));
     this.classList.add("active");
     
-    // ⭐ Прокручиваем категорию в центр при клике
+    // Прокручиваем категорию в центр при клике
     this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
     SELECTED_CATEGORY = catId;
